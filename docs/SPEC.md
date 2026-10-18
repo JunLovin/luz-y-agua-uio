@@ -449,7 +449,9 @@ La sal para deduplicar reportes **no** es una variable de entorno: es aleatoria 
 
 ## 12. Seguridad e incidentes
 
-- `SECURITY.md` explica cómo reportar una vulnerabilidad en privado (correo de contacto, no issues públicos).
-- Ante una filtración o acceso indebido: cortar el acceso, rotar las claves afectadas, evaluar qué datos se expusieron y, si hubo datos personales comprometidos, notificar a la Superintendencia de Protección de Datos Personales dentro del plazo legal (5 días según la LOPDP; confirmar con el abogado) y avisar a los usuarios con un mensaje en la app y en la web.
+- `SECURITY.md` explica cómo reportar una vulnerabilidad en privado (correo de contacto o reporte privado de vulnerabilidades de GitHub, nunca issues públicos).
+- Ante una filtración o acceso indebido: cortar el acceso, rotar las claves afectadas, evaluar qué datos se expusieron y, si hubo datos personales comprometidos, notificar a la Superintendencia de Protección de Datos Personales en el término de 5 días desde que se tuvo constancia de la vulneración (LOPDP art. 43 y Norma Técnica de Notificación de Vulneraciones, Resolución SPDP-SPD-2026-0040-R), por medios digitales a través del sistema de la Superintendencia (SISPDP), y avisar a los usuarios con un mensaje en la app y en la web.
+- Los proveedores que tratan datos por nuestra cuenta (encargados) deben avisarnos de cualquier vulneración en un máximo de 2 días; se verifica en sus acuerdos de tratamiento de datos.
+- Las transferencias internacionales a proveedores (Supabase, Vercel, Google) se documentan y la documentación se conserva al menos 3 años (Resolución SPDP-SPD-2026-0004-R).
 - Con el diseño de esta SPEC, una filtración de la base expondría solo datos públicos y conteos anónimos. Mantener eso cierto es la mejor defensa: cualquier cambio que agregue datos personales al servidor requiere actualizar esta SPEC y la política de privacidad **antes** de programarlo.
 - La API de Claude solo recibe documentos públicos (cronogramas y comunicados). Nunca se le envían reportes, IPs ni nada que venga de los usuarios.
