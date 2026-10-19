@@ -12,6 +12,7 @@ env:
   NEXT_TELEMETRY_DISABLED: 1
   EXPO_NO_TELEMETRY: 1
   TURBO_TELEMETRY_DISABLED: 1
+  DO_NOT_TRACK: 1
 
 jobs:
   check:
@@ -29,6 +30,16 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
+        with:
+          version: 2.117.0
+      - run: supabase db start
+      - run: supabase test db
 
   secrets:
     runs-on: ubuntu-latest

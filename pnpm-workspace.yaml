@@ -1,8 +1,12 @@
 packages:
   - apps/*
   - packages/*
+  - scripts
 
 allowBuilds:
+  better-sqlite3: false
+  esbuild: false
+  msgpackr-extract: false
   lefthook: true
   sharp: false
   unrs-resolver: false

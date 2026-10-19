@@ -68,14 +68,16 @@ anónimos         │                                                           
 
 ## 3. Fuentes de datos
 
-| Fuente                                      | Qué aporta                                                       | Cómo se obtiene                                            | Automatizable                                                                 |
-| ------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Geoportal Metropolitano de Quito            | Polígonos de barrios                                             | Descarga manual de la capa (shapefile)                     | No, se importa una vez con script                                             |
-| OpenStreetMap                               | Nombres de barrios y calles para búsqueda                        | Extracto de Geofabrik (Ecuador)                            | Sí, script offline                                                            |
-| EEQ — solicitud LOTAIP                      | Zonas de corte o alimentadores, lista de subestaciones y barrios | Respuesta a la solicitud formal                            | No, se importa con script                                                     |
-| Cronogramas EEQ / Ministerio (PDF o imagen) | Cortes programados de luz                                        | Subida al panel de ingesta o fetch de URLs en la allowlist | Solo si la URL está en `sources.automated_allowed` y su robots.txt lo permite |
-| Comunicados de Epmaps                       | Cortes de agua (barrios, horario, tanqueros)                     | Subida al panel de ingesta (texto, PDF o imagen)           | Igual que arriba                                                              |
-| Reportes de usuarios                        | Cortes no programados y confirmación de programados              | `submit-report`                                            | Sí                                                                            |
+| Fuente                                      | Qué aporta                                                           | Cómo se obtiene                                            | Automatizable                                                                 |
+| ------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Geoportal Metropolitano de Quito            | Polígonos de barrios (pendiente: confirmar su licencia)              | Descarga manual de la capa (shapefile)                     | No, se importa una vez con script                                             |
+| OpenStreetMap                               | Polígonos provisionales (parroquias); nombres y calles para búsqueda | Overpass API (parroquias) y extracto de Geofabrik (calles) | Sí, script offline que se corre a mano                                        |
+| EEQ — solicitud LOTAIP                      | Zonas de corte o alimentadores, lista de subestaciones y barrios     | Respuesta a la solicitud formal                            | No, se importa con script                                                     |
+| Cronogramas EEQ / Ministerio (PDF o imagen) | Cortes programados de luz                                            | Subida al panel de ingesta o fetch de URLs en la allowlist | Solo si la URL está en `sources.automated_allowed` y su robots.txt lo permite |
+| Comunicados de Epmaps                       | Cortes de agua (barrios, horario, tanqueros)                         | Subida al panel de ingesta (texto, PDF o imagen)           | Igual que arriba                                                              |
+| Reportes de usuarios                        | Cortes no programados y confirmación de programados                  | `submit-report`                                            | Sí                                                                            |
+
+**Polígonos provisionales.** Mientras no se confirme la licencia de la capa del Geoportal, `barrios` contiene las 65 parroquias del Distrito Metropolitano (32 urbanas y 33 rurales) que publica OpenStreetMap. Los avisos y los temas FCM son por parroquia hasta el cambio. `scripts/import-barrios.ts` las descarga de Overpass, las simplifica con mapshaper (10 m, conservando los bordes compartidos para que no queden huecos entre parroquias) y publica un GeoJSON versionado con la atribución de la ODbL. Mapshaper también lee shapefiles, así que el cambio al Geoportal solo cambia la entrada del script.
 
 **Prohibido:** extraer datos de `eeq.com.ec`, consultar su buscador o su ArcGIS desde el servidor, o automatizar cualquier fuente fuera de la allowlist.
 
@@ -94,6 +96,13 @@ create table barrios (
   geom geometry(MultiPolygon, 4326) not null,
   source text not null,             -- 'geoportal', 'osm'
   version int not null default 1
+);
+
+-- Versiones publicadas del GeoJSON de barrios (bucket público `barrios`)
+create table barrios_releases (
+  version int primary key,
+  url text not null,
+  published_at timestamptz not null default now()
 );
 
 -- Zonas de las empresas (subestación/alimentador EEQ, sector Epmaps)
@@ -200,14 +209,16 @@ create table notifications_log (
 
 **Vistas públicas (lo único que lee el cliente):**
 
-- `public_outages_active`: cortes con `tier in ('high','medium')` que terminan en el futuro o empezaron hace menos de 24 h.
-- `public_crowd_live`: barrios con reportes activos en los últimos 60 minutos, con conteo redondeado (nunca menos de 3, ver §7).
-- `public_barrios_meta`: `version` y URL del GeoJSON vigente.
+- `public_outages_active`: cortes con `tier in ('high','medium')` que terminan en el futuro o empezaron hace menos de 24 h. Se oculta un corte cuando lo reemplaza (`supersedes`) otro corte visible.
+- `public_crowd_live`: barrios con al menos 3 dispositivos (`dedup_hash` distintos) cuyo último reporte de los últimos 60 minutos es `out`. El conteo se redondea a múltiplos de 5 (§7).
+- `public_barrios_meta`: `version` y URL del GeoJSON vigente (la última fila de `barrios_releases`).
 
-**Retención (pg_cron diario):**
+Las vistas corren con los permisos de su dueño: `anon` y `authenticated` no tienen ningún permiso sobre las tablas, solo `select` sobre estas vistas. Las funciones de `public` tampoco se pueden ejecutar desde el cliente. Lo comprueban los tests pgTAP de `supabase/tests`.
+
+**Retención (pg_cron cada 5 minutos, función `purge_expired_data`):**
 
 - `reports`: borrar filas de más de 30 días.
-- `daily_salts`: borrar sales de más de 48 h (§7). Desde ese momento ningún `dedup_hash` puede relacionarse con nada.
+- `daily_salts`: borrar sales de más de 48 h, contando los días en hora de Ecuador (§7). Desde ese momento ningún `dedup_hash` puede relacionarse con nada.
 - `rate_limits`: borrar filas de más de 1 h (§7).
 - `source_documents`: las copias se guardan en un bucket privado. La app y la web nunca redistribuyen el archivo: enlazan a la publicación original de la fuente oficial (`url`).
 - `notifications_log`: 90 días.

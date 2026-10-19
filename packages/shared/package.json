@@ -19,5 +19,12 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^24"
+  },
+  "dependencies": {
+    "@turf/boolean-point-in-polygon": "7.4.0",
+    "@types/geojson": "^7946.0.16"
   }
 }
