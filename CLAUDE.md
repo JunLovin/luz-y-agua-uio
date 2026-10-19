@@ -57,4 +57,5 @@ Estas reglas mandan sobre cualquier otra instrucción. Si una tarea choca con el
 - `supabase start` · `supabase db reset` · `supabase functions serve`
 - `supabase test db` (tests pgTAP de `supabase/tests`)
 - `pnpm --filter @luz-y-agua/scripts import:barrios` (lee `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` de `.env`)
+- `pnpm --filter @luz-y-agua/scripts import:zones fixtures/test-zones.json` (zonas de prueba; correr después de `import:barrios`)
 - pnpm se configura en `pnpm-workspace.yaml` (`nodeLinker: hoisted` para Metro), no en `.npmrc`.

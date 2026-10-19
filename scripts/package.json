@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "import:barrios": "tsx --env-file-if-exists=../.env src/import-barrios.ts",
+    "import:zones": "tsx --env-file-if-exists=../.env src/import-zones.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run"
