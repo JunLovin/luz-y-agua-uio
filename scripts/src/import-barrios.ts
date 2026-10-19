@@ -1,9 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
 import type { FeatureCollection } from "geojson";
 import mapshaper from "mapshaper";
 import osmtogeojson from "osmtogeojson";
 import { parroquiasFromOsm, type BarrioFeature } from "./barrios.js";
 import { queryOverpass } from "./overpass.js";
+import { createServiceClient } from "./supabase.js";
 
 const MAX_BYTES = 3 * 1024 * 1024;
 const SIMPLIFY_METERS = 10;
@@ -17,12 +17,6 @@ area["name"="Quito"]["admin_level"="6"]->.quito;
 relation["boundary"="administrative"]["admin_level"~"^(8|9)$"](area.quito);
 out body; >; out skel qt;`;
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing ${name}`);
-  return value;
-}
-
 async function simplify(features: BarrioFeature[]): Promise<FeatureCollection> {
   const output = await mapshaper.applyCommands(
     `-i in.json -clean -simplify interval=${SIMPLIFY_METERS} keep-shapes -clean -o out.json format=geojson precision=0.00001`,
@@ -32,13 +26,7 @@ async function simplify(features: BarrioFeature[]): Promise<FeatureCollection> {
 }
 
 async function main() {
-  const supabase = createClient(
-    requireEnv("SUPABASE_URL"),
-    requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
-    {
-      auth: { persistSession: false },
-    },
-  );
+  const supabase = createServiceClient();
 
   const osm = osmtogeojson(await queryOverpass(QUITO_PARROQUIAS));
   const parroquias = parroquiasFromOsm(
