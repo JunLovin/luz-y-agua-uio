@@ -81,7 +81,11 @@ anónimos         │                                                           
 
 **Prohibido:** extraer datos de `eeq.com.ec`, consultar su buscador o su ArcGIS desde el servidor, o automatizar cualquier fuente fuera de la allowlist.
 
-**Ingesta sin revisión manual diaria.** El "panel de ingesta" es una ruta protegida en `apps/web/admin` que acepta subir un archivo o pegar una URL. No hay aprobación humana: todo pasa por el validador y el motor de confianza (§5). El panel solo existe para alimentar fuentes que no se pueden automatizar.
+**Ingesta sin revisión manual diaria.** El "panel de ingesta" es la ruta `/admin/ingesta` de `apps/web`, que acepta subir un archivo (PDF, imagen o texto, máximo 20 MB) o pegar una URL. No hay aprobación humana: todo pasa por el validador y el motor de confianza (§5). El panel solo existe para alimentar fuentes que no se pueden automatizar.
+
+- **Acceso:** solo la cuenta `ADMIN_EMAIL`, con un código de 6 dígitos por correo que vence a los 10 minutos. El registro público de cuentas está desactivado: la cuenta del admin se crea a mano. La sesión vive en cookies `httpOnly`, `Secure` y `SameSite=Strict` limitadas a `/admin`.
+- **Edge Function `ingest-source`:** verifica que quien llama sea el admin con el correo confirmado, calcula el `sha256` y guarda el archivo en el bucket privado `source-documents`. Un documento ya extraído no se reprocesa. Uno que falló se reintenta si se vuelve a subir, hasta 3 intentos.
+- **URLs:** solo `https`, solo bajo el `base_url` de una fuente con `automated_allowed`, nunca `eeq.com.ec` (bloqueado en el código y con una restricción en la base) y siempre respetando el `robots.txt` del sitio. La descarga usa un User-Agent propio y no sigue redirecciones. Hoy ninguna fuente está automatizada: todo entra subido a mano.
 
 ---
 
@@ -120,7 +124,7 @@ create table zone_barrio (
   zone_id text references utility_zones(id),
   barrio_id text references barrios(id),
   weight real not null check (weight between 0 and 1),  -- 1 = declarado por la fuente oficial
-  origin text not null check (origin in ('official','geometry','learned')),
+  origin text not null check (origin in ('official','geometry','learned','candidate')),  -- 'candidate': aún no confiable (§5.5)
   updated_at timestamptz not null default now(),
   primary key (zone_id, barrio_id)
 );
@@ -133,7 +137,10 @@ create table source_documents (
   storage_path text,                -- copia en un bucket PRIVADO de Supabase Storage (solo para el extractor)
   sha256 text not null unique,      -- evita reprocesar el mismo documento
   received_at timestamptz not null default now(),
-  status text not null check (status in ('pending','extracted','failed'))
+  status text not null check (status in ('pending','extracted','failed')),
+  attempts int not null default 0,  -- máximo 3 (§5.6)
+  last_error text,
+  failure_alerted_at timestamptz    -- la alarma de "falló tres veces" se envía una sola vez
 );
 
 create table sources (
@@ -159,7 +166,9 @@ create table outages (
   source_label text not null,       -- texto visible: "Cronograma EEQ publicado el 18 oct, 18:00"
   supersedes uuid references outages(id),   -- corrección de un corte anterior
   notes text,                       -- tanqueros, motivo, etc.
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  evaluated_at timestamptz,         -- cuándo lo revisó evaluate_outages (§5.4)
+  confirmed boolean                 -- hubo pico de reportes en su ventana
 );
 
 -- Reportes anónimos de usuarios
@@ -239,12 +248,16 @@ type ExtractedOutage = {
   date: string; // YYYY-MM-DD
   start: string; // HH:mm, hora de Ecuador (UTC-5)
   end: string | null;
-  notes?: string;
+  endsNextDay: boolean; // termina después de la medianoche ("24:00" = "00:00" del día siguiente)
+  notes: string | null;
 };
 ```
 
-- **Doble extracción:** dos llamadas independientes a la API de Claude con prompts distintos (uno pide una tabla, otro pide JSON directo). El modelo se configura con `ANTHROPIC_MODEL`; no se escribe en el código.
-- **Comparación:** se normalizan ambas salidas y se calcula el acuerdo por fila (mismas zonas, misma fecha, mismas horas).
+- **Doble extracción:** dos llamadas independientes y en paralelo a la API de Claude con prompts distintos. Una primero transcribe las tablas del documento a Markdown y arma las filas desde esa transcripción; la otra devuelve las filas directamente. Las dos usan salida estructurada (JSON Schema generado desde el esquema Zod) y se validan con Zod.
+- **Modelo:** se configura con `ANTHROPIC_MODEL` (por defecto `claude-opus-5-5`, esfuerzo `medium`) y nunca se escribe en el código. Las llamadas activan el respaldo del servidor (`fallbacks: "default"`): si el modelo rechaza un documento por un falso positivo, la API lo reintenta con otro modelo.
+- **Prompts:** una fila por fecha y franja horaria (los rangos de días y las dos franjas de un mismo día se separan), nombres tal como aparecen, sin corregirlos ni inventarlos. Si la fecha no trae año, se usa el más cercano al día en que se recibió el documento. El documento es dato, no instrucción: el prompt pide ignorar cualquier instrucción escrita dentro.
+- **Comparación:** las filas de ambas extracciones se emparejan uno a uno dentro de la misma franja (servicio, fecha, horas), las de mayor coincidencia primero. El acuerdo de una fila es el índice de Jaccard de sus nombres normalizados; una fila que solo encontró una extracción tiene acuerdo 0. Las filas repetidas dentro de una extracción se eliminan.
+- **Normalización de nombres:** sin tildes ni mayúsculas, abreviaturas expandidas ("S." → "san", "STA." → "santa", "CDLA." → "ciudadela"), sin prefijos genéricos ("Subestación", "Barrio", "Sector") ni el número de sector o etapa al final ("Solanda S.1" → "solanda"). La comparación es difusa (coeficiente de Dice sobre bigramas) con el umbral `validator.nameSimilarity` de `config.ts`.
 - Los documentos se guardan con su `sha256`; si llega el mismo archivo otra vez, no se reprocesa.
 
 ### 5.2 Validador (reglas deterministas)
@@ -254,7 +267,9 @@ Una fila se descarta si:
 - La fecha no está entre hoy y hoy + 14 días.
 - `end <= start` (salvo cortes que cruzan la medianoche, marcados explícitamente).
 - Duración mayor a 24 h.
-- Ninguna `zoneName` coincide con `utility_zones.name` o sus `aliases` (comparación difusa con umbral en `config.ts`), y ninguna `barrioName` coincide con `barrios`.
+- Ninguna `zoneName` coincide con `utility_zones.name` o sus `aliases` del mismo servicio, y ningún nombre de barrio coincide con `barrios`. Una zona que no es una zona conocida también se compara con `barrios`, porque muchas veces es una parroquia ("Zona de cortes: Alangasí").
+
+**Zonas fuera de Quito.** La EEQ también atiende Rumiñahui, Mejía y otros cantones. Si la zona de una fila es uno de esos lugares, la fila se guarda pero se queda en `low`: así no se pierden las parroquias de Quito que atiende (Los Bancos → Nanegalito) y no se publica un sector que solo comparte el nombre con una de Quito (Sangolquí → "San Juan").
 
 ### 5.3 Puntaje de confianza
 
@@ -271,24 +286,34 @@ confidence = 0.40 · acuerdo_doble_extracción
 | medium | 0.55–0.79               | Se publica en el mapa como "Sin confirmar", sin notificación |
 | low    | < 0.55                  | Se guarda para depuración, no se muestra                     |
 
+- `acuerdo_doble_extracción`: el acuerdo de la fila (§5.1).
+- `coincidencia_de_zonas`: 1 si alguna zona coincidió con una zona conocida; si no, la fracción de nombres de barrio que coincidieron con `barrios`.
+- `confirmación_otra_fuente`: 1 si otra fuente ya publicó un corte `high` o `medium` del mismo servicio, con la misma hora de inicio y algún barrio en común.
+- El puntaje se redondea a 4 decimales antes de compararlo con los umbrales.
+
 ### 5.4 Aprendizaje de `sources.trust`
 
-Después de cada corte programado de nivel high, el job `evaluate-accuracy` mira `reports` de los barrios afectados en la ventana `[starts_at − 10 min, starts_at + 30 min]`:
+Cada 10 minutos, `evaluate_outages()` (pg_cron) revisa los cortes programados de nivel high cuya ventana `[starts_at − 10 min, starts_at + 30 min]` ya cerró, y mira `reports` de los barrios afectados:
 
-- Si hubo un pico de reportes `out`: el corte se confirma y `trust` sube un poco.
-- Si no hubo reportes y hay suscriptores conocidos en la zona (usar el conteo de reportes históricos del barrio como proxy), `trust` baja un poco.
+- Si algún barrio tuvo un pico de reportes `out` (al menos `crowd.minDistinctReports` dispositivos distintos): el corte se marca `confirmed` y `trust` sube `learning.trustStep`.
+- Si no hubo ningún reporte y algún barrio tiene historial de reportes de ese servicio (proxy de que hay gente que usa la app ahí), `trust` baja `learning.trustStep`.
+- Cada corte se evalúa una sola vez. `trust` se mantiene entre 0 y 1, redondeado a 4 decimales.
 
 ### 5.5 Aprendizaje de `zone_barrio`
 
-Si un barrio sin relación declarada con la zona Z muestra un pico de reportes `out` dentro de la ventana de un corte programado de Z, su `weight` con Z sube. Con suficientes coincidencias pasa a `origin = 'learned'`. Todo se hace con conteos por barrio: no se usa ninguna ubicación individual.
+Si un barrio sin relación declarada con la zona Z muestra un pico de reportes `out` dentro de la ventana de un corte programado de Z, su `weight` con Z sube `learning.zoneBarrioStep`, empezando como `origin = 'candidate'`. Al llegar a `learning.learnedWeight` pasa a `origin = 'learned'`. Los enlaces `candidate` no se usan para resolver cortes, y los `official` nunca se tocan. Un mismo pico cuenta una sola vez por zona y hora de inicio, aunque varios cortes de la zona compartan esa hora. Todo se hace con conteos por barrio: no se usa ninguna ubicación individual.
+
+Todos los umbrales de §5.4 y §5.5 viven en `config.ts`. El SQL los lee de la función `thresholds()`, y un test falla si se desalinean.
 
 ### 5.6 Alarmas para el desarrollador
 
-Un job diario envía un correo o un mensaje de Telegram (variable `ALERT_WEBHOOK_URL`) solo si:
+Todos los días a las 08:00 de Quito, pg_cron llama (con `pg_net`) a la Edge Function `send-alerts`, que envía un correo a `ADMIN_EMAIL` con Resend (`RESEND_API_KEY`) solo si `pending_alerts()` devuelve algo:
 
-- Más del 30 % de los documentos de un día terminaron en `low`.
-- Una fuente con historial no publicó nada en 72 h en temporada de cortes.
-- Falló la extracción de un documento tres veces.
+- Más del 30 % de los documentos extraídos en las últimas 24 h no publicaron ningún corte `high` ni `medium`.
+- Una fuente activa (al menos 3 documentos en los 14 días anteriores) lleva 72 h sin enviar documentos. Así se aproxima "en temporada de cortes".
+- Falló la extracción de un documento tres veces. Cada documento se avisa una sola vez y se marca solo después de que el correo salió.
+
+El cron lee la URL del proyecto y la llave `service_role` de los secretos `project_url` y `service_role_key` del Vault de Supabase, que se crean a mano en cada entorno. `send-alerts` solo acepta esa llave.
 
 ---
 
@@ -445,7 +470,8 @@ ANTHROPIC_MODEL=
 FCM_SERVICE_ACCOUNT_B64=
 FCM_PROJECT_ID=
 # Alarmas
-ALERT_WEBHOOK_URL=
+RESEND_API_KEY=                   # alarmas por correo (§5.6)
+ALERT_FROM_EMAIL=                 # opcional; por defecto el remitente de prueba de Resend
 # Web
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
