@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "HH:mm");
+const time = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "HH:mm")
+  .describe("HH:mm, 24-hour, local Ecuador time");
 
 export const extractedOutageSchema = z.object({
   service: z.enum(["luz", "agua"]),

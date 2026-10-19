@@ -127,6 +127,24 @@ describe("assess", () => {
     ).toMatchObject({ confidence: 0.65, tier: "medium" });
   });
 
+  it("keeps a row whose zone is outside Quito but caps it at low", () => {
+    const result = accepted(
+      doc(
+        row({
+          zoneNames: ["Subestación Los Bancos"],
+          barrioNames: ["Solanda"],
+        }),
+      ),
+    );
+    expect(result).toMatchObject({
+      outsideQuito: true,
+      tier: "low",
+      barrioIds: ["solanda"],
+      placeMatch: 1,
+    });
+    expect(result.confidence).toBe(0.8);
+  });
+
   it("adds cross-source confirmation when the callback confirms", () => {
     const [result] = assess(
       doc(row({ barrioNames: ["Solanda", "Sangolquí"] })),

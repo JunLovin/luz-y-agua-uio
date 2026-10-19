@@ -5,6 +5,7 @@ import {
   normalizeName,
   type NamedPlace,
 } from "./names.js";
+import { OUTSIDE_QUITO } from "./outside-places.js";
 import type { ExtractedOutage, Extraction } from "./schema.js";
 import { daysBetween, ecuadorDate, toInterval } from "./time.js";
 
@@ -24,6 +25,8 @@ export type AssessContext = {
 export type Rejection =
   "date_out_of_range" | "end_not_after_start" | "too_long" | "no_known_place";
 
+const OUTSIDE_QUITO_INDEX = indexPlaces(OUTSIDE_QUITO);
+
 export type Candidate = {
   row: ExtractedOutage;
   agreement: number;
@@ -32,6 +35,7 @@ export type Candidate = {
   zoneId: string | null;
   barrioIds: string[];
   placeMatch: number;
+  outsideQuito: boolean;
 };
 
 export type Assessment =
@@ -139,12 +143,36 @@ export function assess(
         return { status: "rejected", row, reason: "too_long" };
       }
 
-      const zoneIds = row.zoneNames
-        .map((name) =>
-          matchPlace(name, zoneIndexes[row.service], validator.nameSimilarity),
-        )
+      const isOutside = (name: string) =>
+        matchPlace(name, OUTSIDE_QUITO_INDEX, validator.nameSimilarity) !==
+        null;
+      // A zone outside Quito can serve Quito parroquias (Los Bancos → Nanegalito)
+      // and share sector names with them (Sangolquí → "San Juan"): keep it, never publish it.
+      const outsideQuito = row.zoneNames.some(isOutside);
+
+      const zoneMatches = row.zoneNames.map((name) => ({
+        name,
+        id: matchPlace(
+          name,
+          zoneIndexes[row.service],
+          validator.nameSimilarity,
+        ),
+      }));
+      const zoneIds = zoneMatches
+        .map(({ id }) => id)
         .filter((id): id is string => id !== null);
-      const namedBarrioIds = row.barrioNames
+      // An unknown zone is often a parroquia ("Zona de cortes: Alangasí").
+      const barrioCandidates = [
+        ...new Map(
+          [
+            ...row.barrioNames,
+            ...zoneMatches
+              .filter(({ id, name }) => id === null && !isOutside(name))
+              .map(({ name }) => name),
+          ].map((name) => [normalizeName(name), name]),
+        ).values(),
+      ];
+      const namedBarrioIds = barrioCandidates
         .map((name) => matchPlace(name, barrioIndex, validator.nameSimilarity))
         .filter((id): id is string => id !== null);
       if (zoneIds.length === 0 && namedBarrioIds.length === 0)
@@ -156,9 +184,7 @@ export function assess(
       const placeMatch =
         zoneIds.length > 0
           ? 1
-          : row.barrioNames.length === 0
-            ? 0
-            : namedBarrioIds.length / row.barrioNames.length;
+          : namedBarrioIds.length / barrioCandidates.length;
 
       const candidate: Candidate = {
         row,
@@ -168,6 +194,7 @@ export function assess(
         zoneId: zoneIds[0] ?? null,
         barrioIds: [...new Set([...namedBarrioIds, ...zoneBarrioIds])].sort(),
         placeMatch,
+        outsideQuito,
       };
       const confirmed = context.confirmedByOtherSource?.(candidate) ? 1 : 0;
       const confidence =
@@ -178,8 +205,9 @@ export function assess(
             weights.weights.crossSourceConfirmation * confirmed) *
             10_000,
         ) / 10_000;
-      const tier =
-        confidence >= weights.tiers.high
+      const tier = outsideQuito
+        ? "low"
+        : confidence >= weights.tiers.high
           ? "high"
           : confidence >= weights.tiers.medium
             ? "medium"
