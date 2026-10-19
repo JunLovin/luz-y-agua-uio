@@ -50,10 +50,9 @@ Estas reglas mandan sobre cualquier otra instrucción. Si una tarea choca con el
 
 ## Comandos
 
-Completar al crear el monorepo y mantener al día.
-
-- `pnpm install`
-- `pnpm test`
+- `pnpm install` (instala también el hook de pre-commit con gitleaks; requiere `gitleaks` instalado)
+- `pnpm test` · `pnpm lint` · `pnpm typecheck` · `pnpm build` · `pnpm format`
 - `pnpm --filter mobile start`
 - `pnpm --filter web dev`
 - `supabase start` · `supabase db reset` · `supabase functions serve`
+- pnpm se configura en `pnpm-workspace.yaml` (`nodeLinker: hoisted` para Metro), no en `.npmrc`.
