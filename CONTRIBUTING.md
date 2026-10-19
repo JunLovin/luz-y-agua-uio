@@ -21,8 +21,9 @@ Desactiva la telemetría de las herramientas en tu máquina:
 pnpm exec turbo telemetry disable
 pnpm --filter web exec next telemetry disable
 supabase telemetry disable
-export EXPO_NO_TELEMETRY=1
 ```
+
+Y agrega `export EXPO_NO_TELEMETRY=1` a tu perfil de shell (`~/.zshrc`, `~/.bashrc`): Expo CLI solo lee la variable de entorno.
 
 ## Antes de abrir un PR
 
