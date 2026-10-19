@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractionSchema } from "./schema.js";
+import { extractionSchema } from "./schema.ts";
 
 const valid = {
   service: "agua",

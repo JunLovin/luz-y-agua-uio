@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { extractedOutageSchema } from "../domain/schema.js";
+import { extractedOutageSchema } from "../domain/schema.ts";
 
 export const tableExtractionSchema = z.object({
   transcription: z.string(),

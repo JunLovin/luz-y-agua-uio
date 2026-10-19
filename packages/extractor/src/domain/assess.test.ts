@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { assess, pairExtractions, type AssessContext } from "./assess.js";
-import type { ExtractedOutage, Extraction } from "./schema.js";
+import { assess, pairExtractions, type AssessContext } from "./assess.ts";
+import type { ExtractedOutage, Extraction } from "./schema.ts";
 
 const row = (overrides: Partial<ExtractedOutage> = {}): ExtractedOutage => ({
   service: "luz",

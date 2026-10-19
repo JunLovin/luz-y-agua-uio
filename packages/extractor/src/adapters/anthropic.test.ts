@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { describe, expect, it } from "vitest";
-import { ExtractionFailedError, buildRequest, readJson } from "./anthropic.js";
+import { ExtractionFailedError, buildRequest, readJson } from "./anthropic.ts";
 
 const request = {
   system: "system",

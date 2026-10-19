@@ -2,7 +2,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { config } from "./config.js";
+import { config } from "./config.ts";
 
 const migrationsDir = join(import.meta.dirname, "../../../supabase/migrations");
 const sql = readdirSync(migrationsDir)

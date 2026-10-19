@@ -4,10 +4,10 @@ import {
   matchPlace,
   normalizeName,
   type NamedPlace,
-} from "./names.js";
-import { OUTSIDE_QUITO } from "./outside-places.js";
-import type { ExtractedOutage, Extraction } from "./schema.js";
-import { daysBetween, ecuadorDate, toInterval } from "./time.js";
+} from "./names.ts";
+import { OUTSIDE_QUITO } from "./outside-places.ts";
+import type { ExtractedOutage, Extraction } from "./schema.ts";
+import { daysBetween, ecuadorDate, toInterval } from "./time.ts";
 
 export type Catalog = {
   zones: (NamedPlace & { service: "luz" | "agua" })[];

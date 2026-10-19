@@ -2,9 +2,9 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import { assess, type Catalog } from "../domain/assess.js";
-import { extractDocument } from "./extract-document.js";
-import type { ExtractionModel, ExtractionRequest } from "./ports.js";
+import { assess, type Catalog } from "../domain/assess.ts";
+import { extractDocument } from "./extract-document.ts";
+import type { ExtractionModel, ExtractionRequest } from "./ports.ts";
 
 type Recorded = {
   receivedDate: string;

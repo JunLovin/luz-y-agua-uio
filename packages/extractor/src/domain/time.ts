@@ -1,4 +1,4 @@
-import type { ExtractedOutage } from "./schema.js";
+import type { ExtractedOutage } from "./schema.ts";
 
 // Ecuador has no daylight saving time.
 const ECUADOR_OFFSET = "-05:00";

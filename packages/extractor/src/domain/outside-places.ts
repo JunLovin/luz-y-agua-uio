@@ -1,4 +1,4 @@
-import type { NamedPlace } from "./names.js";
+import type { NamedPlace } from "./names.ts";
 
 /**
  * Places the EEQ also serves outside the Distrito Metropolitano de Quito. A row whose

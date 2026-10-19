@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { indexPlaces, matchPlace, normalizeName, similarity } from "./names.js";
+import { indexPlaces, matchPlace, normalizeName, similarity } from "./names.ts";
 
 describe("normalizeName", () => {
   it.each([

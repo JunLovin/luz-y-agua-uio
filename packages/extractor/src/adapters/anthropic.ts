@@ -3,7 +3,7 @@ import type {
   ExtractionModel,
   ExtractionRequest,
   SourceFile,
-} from "../application/ports.js";
+} from "../application/ports.ts";
 
 const MAX_TOKENS = 64_000;
 

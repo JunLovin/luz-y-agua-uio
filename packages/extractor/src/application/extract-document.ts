@@ -1,12 +1,12 @@
-import { extractionSchema, type Extraction } from "../domain/schema.js";
-import { toOutputSchema } from "./json-schema.js";
-import type { ExtractionModel, SourceFile } from "./ports.js";
+import { extractionSchema, type Extraction } from "../domain/schema.ts";
+import { toOutputSchema } from "./json-schema.ts";
+import type { ExtractionModel, SourceFile } from "./ports.ts";
 import {
   SYSTEM_PROMPT,
   directRequestInstructions,
   tableExtractionSchema,
   tableRequestInstructions,
-} from "./prompts.js";
+} from "./prompts.ts";
 
 const TABLE_SCHEMA = toOutputSchema(tableExtractionSchema);
 const DIRECT_SCHEMA = toOutputSchema(extractionSchema);
