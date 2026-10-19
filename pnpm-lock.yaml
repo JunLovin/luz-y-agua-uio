@@ -82,7 +82,11 @@ importers:
 
   packages/extractor: {}
 
-  packages/shared: {}
+  packages/shared:
+    devDependencies:
+      '@types/node':
+        specifier: ^24
+        version: 24.19.2
 
 packages:
 
