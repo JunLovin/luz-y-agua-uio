@@ -1,3 +1,4 @@
+import { config } from "@luz-y-agua/shared";
 import { assess, type Catalog } from "../domain/assess.ts";
 import {
   checkUrl,
@@ -10,7 +11,6 @@ import { extractDocument } from "./extract-document.ts";
 import type { ExtractionModel, SourceFile } from "./ports.ts";
 
 const MAX_BYTES = 20 * 1024 * 1024;
-const MAX_ATTEMPTS = 3;
 const MEDIA_TYPES = {
   "application/pdf": "pdf",
   "image/png": "png",
@@ -219,7 +219,7 @@ export async function ingest(
     const documentId = document.id;
     if (
       document.status === "extracted" ||
-      document.attempts >= MAX_ATTEMPTS ||
+      document.attempts >= config.ingestion.maxAttempts ||
       !(await repository.claimAttempt(documentId, document.attempts))
     ) {
       return { status: "duplicate", documentId };
@@ -287,7 +287,7 @@ export async function ingest(
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       await repository.finishAttempt(documentId, {
-        status: attempts >= MAX_ATTEMPTS ? "failed" : "pending",
+        status: attempts >= config.ingestion.maxAttempts ? "failed" : "pending",
         lastError: message.slice(0, 500),
       });
       return { status: "failed", documentId, attempts, error: message };
