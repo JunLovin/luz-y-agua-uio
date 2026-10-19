@@ -1,0 +1,23 @@
+{
+  "name": "@luz-y-agua/scripts",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "import:barrios": "tsx --env-file-if-exists=../.env src/import-barrios.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2"
+  },
+  "devDependencies": {
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^24.19.2",
+    "mapshaper": "0.7.74",
+    "osmtogeojson": "3.0.0-beta.5",
+    "tsx": "4.23.15"
+  }
+}
