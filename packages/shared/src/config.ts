@@ -15,6 +15,7 @@ export const config = {
   validator: {
     maxDaysAhead: 14,
     maxDurationMs: DAY_MS,
+    nameSimilarity: 0.85,
   },
   accuracyWindow: {
     beforeStartMs: 10 * MINUTE_MS,
