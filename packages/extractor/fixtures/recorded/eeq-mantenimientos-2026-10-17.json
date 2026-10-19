@@ -1,0 +1,58 @@
+{
+  "source": {
+    "description": "EEQ, mantenimientos de contingencia, sábado 17 de octubre de 2026 (PDF, 1 página)",
+    "sha256": "15162ad69a2d177ec1c4131da67e0b91c846fc9f3fa41bd69e3ac9563ff93676"
+  },
+  "receivedDate": "2026-10-16",
+  "responses": {
+    "table": {
+      "transcription": "| Zona de mantenimiento | Sectores | Tipo de trabajo | Horario |\n|---|---|---|---|\n| SANGOLQUÍ | VÍA AMAGUAÑA, SAN JUAN, SAN LUIS | MANTENIMIENTO PERIÓDICO | 03:00 a 06:00 |\n| TUMBACO | TUMBACO, EL CHICHE - AV. OSWALDO GUAYASAMÍN | MANTENIMIENTO EMERGENTE | 03:00 a 06:00 |",
+      "outages": [
+        {
+          "service": "luz",
+          "zoneNames": ["SANGOLQUÍ"],
+          "barrioNames": ["VÍA AMAGUAÑA", "SAN JUAN", "SAN LUIS"],
+          "date": "2026-10-17",
+          "start": "03:00",
+          "end": "06:00",
+          "endsNextDay": false,
+          "notes": "Mantenimiento periódico"
+        },
+        {
+          "service": "luz",
+          "zoneNames": ["TUMBACO"],
+          "barrioNames": ["TUMBACO", "EL CHICHE - AV. OSWALDO GUAYASAMÍN"],
+          "date": "2026-10-17",
+          "start": "03:00",
+          "end": "06:00",
+          "endsNextDay": false,
+          "notes": "Mantenimiento emergente"
+        }
+      ]
+    },
+    "direct": {
+      "outages": [
+        {
+          "service": "luz",
+          "zoneNames": ["Sangolquí"],
+          "barrioNames": ["Vía Amaguaña", "San Juan", "San Luis"],
+          "date": "2026-10-17",
+          "start": "03:00",
+          "end": "06:00",
+          "endsNextDay": false,
+          "notes": "Mantenimiento periódico"
+        },
+        {
+          "service": "luz",
+          "zoneNames": ["Tumbaco"],
+          "barrioNames": ["Tumbaco", "El Chiche", "Av. Oswaldo Guayasamín"],
+          "date": "2026-10-17",
+          "start": "03:00",
+          "end": "06:00",
+          "endsNextDay": false,
+          "notes": "Mantenimiento emergente"
+        }
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { config } from "./config.js";
+import { config } from "./config.ts";
 
 const migrationsDir = join(import.meta.dirname, "../../../supabase/migrations");
 const sql = readdirSync(migrationsDir)
@@ -70,5 +70,25 @@ describe("SQL mirrors config.ts", () => {
       `round(count(*) / ${config.crowd.displayRoundTo}.0) * ${config.crowd.displayRoundTo}`,
     );
     expect(view).toContain(`having count(*) >= ${config.crowd.displayMinimum}`);
+  });
+
+  it("thresholds() for learning and alerts", () => {
+    const literal = [
+      ...sql.matchAll(
+        /create (?:or replace )?function thresholds\(\)[\s\S]*?select '(\{[\s\S]*?\})'::jsonb/g,
+      ),
+    ].at(-1)?.[1];
+    expect(JSON.parse(literal ?? "null")).toEqual({
+      accuracyBeforeMinutes: config.accuracyWindow.beforeStartMs / 60_000,
+      accuracyAfterMinutes: config.accuracyWindow.afterStartMs / 60_000,
+      peakDistinctReports: config.crowd.minDistinctReports,
+      trustStep: config.learning.trustStep,
+      zoneBarrioStep: config.learning.zoneBarrioStep,
+      learnedWeight: config.learning.learnedWeight,
+      lowDocumentShare: config.alerts.lowDocumentShare,
+      silentSourceHours: config.alerts.silentSourceMs / 3_600_000,
+      activeSourceDocuments: config.alerts.activeSourceDocuments,
+      activeSourceWindowDays: config.alerts.activeSourceWindowMs / 86_400_000,
+    });
   });
 });

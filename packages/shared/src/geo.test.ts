@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Polygon } from "geojson";
 import { describe, expect, it } from "vitest";
-import { findBarrio, type BarriosGeoJson } from "./geo.js";
+import { findBarrio, type BarriosGeoJson } from "./geo.ts";
 
 const box = (
   west: number,

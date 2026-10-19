@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { topicFor } from "./topics.js";
+import { topicFor } from "./topics.ts";
 
 describe("topicFor", () => {
   it("builds barrio topics for both services", () => {
