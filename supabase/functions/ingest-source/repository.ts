@@ -99,7 +99,10 @@ export function supabaseRepository(db: SupabaseClient): IngestRepository {
       const [barrios, zones, links] = await Promise.all([
         db.from("barrios").select("id, name"),
         db.from("utility_zones").select("id, service, name, aliases"),
-        db.from("zone_barrio").select("zone_id, barrio_id"),
+        db
+          .from("zone_barrio")
+          .select("zone_id, barrio_id")
+          .neq("origin", "candidate"),
       ]);
       return {
         barrios: (check(barrios) ?? []).map((b) => ({
