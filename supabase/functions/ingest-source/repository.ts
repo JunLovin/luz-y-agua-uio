@@ -85,7 +85,7 @@ export function supabaseRepository(db: SupabaseClient): IngestRepository {
           .neq("status", "extracted")
           .select("id"),
       );
-      return rows.length === 1;
+      return (rows ?? []).length === 1;
     },
     async finishAttempt(id, { status, lastError }) {
       check(
@@ -102,13 +102,16 @@ export function supabaseRepository(db: SupabaseClient): IngestRepository {
         db.from("zone_barrio").select("zone_id, barrio_id"),
       ]);
       return {
-        barrios: check(barrios).map((b) => ({ id: b.id, names: [b.name] })),
-        zones: check(zones).map((z) => ({
+        barrios: (check(barrios) ?? []).map((b) => ({
+          id: b.id,
+          names: [b.name],
+        })),
+        zones: (check(zones) ?? []).map((z) => ({
           id: z.id,
           service: z.service,
           names: [z.name, ...z.aliases],
         })),
-        zoneBarrios: check(links).map((l) => ({
+        zoneBarrios: (check(links) ?? []).map((l) => ({
           zoneId: l.zone_id,
           barrioId: l.barrio_id,
         })),
@@ -123,7 +126,7 @@ export function supabaseRepository(db: SupabaseClient): IngestRepository {
           .in("tier", ["high", "medium"])
           .gte("starts_at", since),
       );
-      return rows.map((row) => ({
+      return (rows ?? []).map((row) => ({
         sourceId:
           (row.source_documents as unknown as { source_id: string } | null)
             ?.source_id ?? "",

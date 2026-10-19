@@ -1,4 +1,5 @@
 {
+  "lock": false,
   "imports": {
     "@anthropic-ai/sdk": "npm:@anthropic-ai/sdk@0.131.0",
     "@luz-y-agua/shared": "../../../packages/shared/src/index.ts",
