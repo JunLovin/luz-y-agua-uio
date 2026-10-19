@@ -56,6 +56,7 @@ select throws_ok(
   '23514', null, 'zone ids must be topic-safe'
 );
 
+delete from barrios_releases;
 insert into barrios_releases (version, url) values (1, 'v1'), (2, 'v2');
 select is((select url from public_barrios_meta), 'v2', 'barrios meta returns the latest release');
 
