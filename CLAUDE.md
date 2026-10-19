@@ -58,4 +58,6 @@ Estas reglas mandan sobre cualquier otra instrucción. Si una tarea choca con el
 - `supabase test db` (tests pgTAP de `supabase/tests`)
 - `pnpm --filter @luz-y-agua/scripts import:barrios` (lee `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` de `.env`)
 - `pnpm --filter @luz-y-agua/scripts import:zones fixtures/test-zones.json` (zonas de prueba; correr después de `import:barrios`)
+- `deno check --config supabase/functions/<fn>/deno.json supabase/functions/<fn>/index.ts` (tipos de las Edge Functions)
+- Cada entorno necesita en el Vault de Supabase los secretos `project_url` y `service_role_key` para que pg_cron llame a `send-alerts`.
 - pnpm se configura en `pnpm-workspace.yaml` (`nodeLinker: hoisted` para Metro), no en `.npmrc`.
