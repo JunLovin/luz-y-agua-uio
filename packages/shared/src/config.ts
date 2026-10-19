@@ -37,7 +37,7 @@ export const config = {
   notifications: {
     headsUpMinLeadMs: 2 * HOUR_MS,
     imminentLeadMs: 30 * MINUTE_MS,
-    quietHours: { startHour: 22, endHour: 6 },
+    quietHours: { startHour: 22, endHour: 6, timeZone: "America/Guayaquil" },
   },
   retention: {
     reportsMs: 30 * DAY_MS,

@@ -22,4 +22,14 @@ describe("config", () => {
       config.crowd.minDistinctReports,
     );
   });
+
+  it("quiet hours use a valid IANA time zone and in-range hours", () => {
+    const { startHour, endHour, timeZone } = config.notifications.quietHours;
+    expect(() => new Intl.DateTimeFormat("es-EC", { timeZone })).not.toThrow();
+    for (const hour of [startHour, endHour]) {
+      expect(Number.isInteger(hour)).toBe(true);
+      expect(hour).toBeGreaterThanOrEqual(0);
+      expect(hour).toBeLessThan(24);
+    }
+  });
 });
