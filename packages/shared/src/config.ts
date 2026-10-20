@@ -54,6 +54,10 @@ export const config = {
     activeSourceDocuments: 3,
     activeSourceWindowMs: 14 * DAY_MS,
   },
+  mobile: {
+    cityRefreshMs: 5 * MINUTE_MS,
+    locationTimeoutMs: 15_000,
+  },
   retention: {
     reportsMs: 30 * DAY_MS,
     dailySaltsMs: 2 * DAY_MS,
