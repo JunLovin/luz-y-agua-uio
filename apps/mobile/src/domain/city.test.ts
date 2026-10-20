@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { statusFor, type CitySnapshot, type PublicOutage } from "./city";
+import {
+  placeAlerts,
+  statusFor,
+  type CitySnapshot,
+  type PublicOutage,
+} from "./city";
 
 const outage = (
   id: string,
@@ -64,5 +69,39 @@ describe("statusFor", () => {
       outages: [],
       crowd: [],
     });
+  });
+});
+
+describe("placeAlerts", () => {
+  const now = new Date("2026-10-20T15:00:00Z");
+
+  it("summarizes each service: neighbor reports win, then an ongoing cut, then the next one", () => {
+    expect(placeAlerts(snapshot, "solanda", now)).toEqual([
+      {
+        kind: "ongoing",
+        service: "luz",
+        outage: expect.objectContaining({ id: "open-ended" }),
+      },
+      { kind: "crowd", service: "agua", reports: 5 },
+    ]);
+  });
+
+  it("announces the next scheduled cut when nothing is happening yet", () => {
+    const later = {
+      ...snapshot,
+      crowd: [],
+      outages: snapshot.outages.filter((o) => o.id !== "open-ended"),
+    };
+    expect(placeAlerts(later, "solanda", now)).toEqual([
+      {
+        kind: "scheduled",
+        service: "luz",
+        outage: expect.objectContaining({ id: "early" }),
+      },
+    ]);
+  });
+
+  it("is empty for a quiet barrio", () => {
+    expect(placeAlerts(snapshot, "cumbaya", now)).toEqual([]);
   });
 });
