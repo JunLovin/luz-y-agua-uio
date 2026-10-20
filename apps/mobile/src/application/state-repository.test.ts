@@ -18,7 +18,7 @@ describe("stateRepository", () => {
   it("starts empty and round-trips the saved state", () => {
     const repo = stateRepository(memoryStore());
     expect(repo.load()).toEqual(EMPTY_STATE);
-    const state = { ...EMPTY_STATE, ageConfirmed: true, barriosVersion: 2 };
+    const state = { ...EMPTY_STATE, ageConfirmed: true };
     repo.save(state);
     expect(repo.load()).toEqual(state);
   });
@@ -51,7 +51,6 @@ describe("stateRepository", () => {
       places: [place, { id: 2, alias: "Roto" }],
       subscribedTopics: null,
       lastReports: { "solanda:luz": "2026-10-20T10:00:00Z", bad: 1 },
-      barriosVersion: "3",
       ageConfirmed: "yes",
     };
     expect(

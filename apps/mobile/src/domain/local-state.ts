@@ -15,7 +15,6 @@ export type LocalState = {
   subscribedTopics: string[];
   reportNonce: { date: string; value: string } | null;
   lastReports: Record<string, string>;
-  barriosVersion: number;
   ageConfirmed: boolean;
   privacyAcceptedVersion: number;
 };
@@ -25,7 +24,6 @@ export const EMPTY_STATE: LocalState = {
   subscribedTopics: [],
   reportNonce: null,
   lastReports: {},
-  barriosVersion: 0,
   ageConfirmed: false,
   privacyAcceptedVersion: 0,
 };

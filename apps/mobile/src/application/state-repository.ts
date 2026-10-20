@@ -35,7 +35,7 @@ function sanitize(saved: Record<string, unknown>): LocalState {
     subscribedTopics,
     reportNonce,
     lastReports,
-    barriosVersion,
+
     ageConfirmed,
     privacyAcceptedVersion,
   } = saved;
@@ -57,9 +57,6 @@ function sanitize(saved: Record<string, unknown>): LocalState {
           ),
         )
       : EMPTY_STATE.lastReports,
-    barriosVersion: isNumber(barriosVersion)
-      ? barriosVersion
-      : EMPTY_STATE.barriosVersion,
     ageConfirmed: ageConfirmed === true,
     privacyAcceptedVersion: isNumber(privacyAcceptedVersion)
       ? privacyAcceptedVersion
