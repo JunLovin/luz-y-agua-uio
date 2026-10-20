@@ -52,7 +52,9 @@ Estas reglas mandan sobre cualquier otra instrucción. Si una tarea choca con el
 
 - `pnpm install` (instala también el hook de pre-commit con gitleaks; requiere `gitleaks` instalado)
 - `pnpm test` · `pnpm lint` · `pnpm typecheck` · `pnpm build` · `pnpm format`
-- `pnpm --filter mobile start`
+- `pnpm --filter mobile start` (Metro para el dev client; la app no corre en Expo Go)
+- Android: `JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" pnpm --filter mobile android`, y `adb reverse tcp:8081 tcp:8081` para que el emulador vea Metro.
+- iOS: `pnpm --filter mobile exec expo prebuild` y luego `xcodebuild -workspace ios/LuzyAguaUIO.xcworkspace -scheme LuzyAguaUIO -sdk iphonesimulator -derivedDataPath <ruta en el disco externo> build`; instalar el `.app` en el simulador.
 - `pnpm --filter web dev`
 - `supabase start` · `supabase db reset` · `supabase functions serve`
 - `supabase test db` (tests pgTAP de `supabase/tests`)
