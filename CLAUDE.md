@@ -53,13 +53,14 @@ Estas reglas mandan sobre cualquier otra instrucción. Si una tarea choca con el
 - `pnpm install` (instala también el hook de pre-commit con gitleaks; requiere `gitleaks` instalado)
 - `pnpm test` · `pnpm lint` · `pnpm typecheck` · `pnpm build` · `pnpm format`
 - `pnpm --filter mobile start` (Metro para el dev client; la app no corre en Expo Go)
-- Android: `JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" pnpm --filter mobile android`, y `adb reverse tcp:8081 tcp:8081` para que el emulador vea Metro.
+- Android: `ANDROID_HOME=~/Library/Android/sdk JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" pnpm --filter mobile android`, y `adb reverse tcp:8081 tcp:8081` y `adb reverse tcp:54321 tcp:54321` para que el emulador vea Metro y Supabase local.
 - iOS: `pnpm --filter mobile exec expo prebuild` y luego `xcodebuild -workspace ios/LuzyAguaUIO.xcworkspace -scheme LuzyAguaUIO -sdk iphonesimulator -derivedDataPath <ruta en el disco externo> build`; instalar el `.app` en el simulador.
 - `pnpm --filter web dev`
 - `supabase start` · `supabase db reset` · `supabase functions serve`
 - `supabase test db` (tests pgTAP de `supabase/tests`)
 - `pnpm --filter @luz-y-agua/scripts import:barrios` (lee `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` de `.env`)
 - `pnpm --filter @luz-y-agua/scripts import:zones fixtures/test-zones.json` (zonas de prueba; correr después de `import:barrios`)
+- `pnpm --filter @luz-y-agua/scripts publish:basemap <quito.pmtiles> <carpeta de fuentes>` (mapa base al bucket `tiles`; el extracto PMTiles y las fuentes Noto van fuera del repo)
 - `deno check --config supabase/functions/<fn>/deno.json supabase/functions/<fn>/index.ts` (tipos de las Edge Functions)
 - Cada entorno necesita en el Vault de Supabase los secretos `project_url` y `service_role_key` para que pg_cron llame a `send-alerts`.
 - pnpm se configura en `pnpm-workspace.yaml` (`nodeLinker: hoisted` para Metro), no en `.npmrc`.

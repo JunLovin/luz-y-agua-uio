@@ -67,6 +67,8 @@ export const es = {
   addPlace: {
     title: "Agregar lugar",
     useLocation: "Usar mi ubicación",
+    pickOnMap: "Elegir en el mapa",
+    pickOnMapHint: "Toca tu barrio en el mapa.",
     searchLabel: "O busca tu barrio por nombre",
     searchPlaceholder: "Ej.: Solanda, Cumbayá",
     noResults: "No encontramos ese barrio.",
@@ -104,6 +106,17 @@ export const es = {
     },
     remove: "Borrar este lugar",
     removeConfirm: "¿Borrar este lugar? Dejarás de recibir sus avisos.",
+  },
+  map: {
+    title: "Mapa en vivo",
+    open: "Ver el mapa",
+    attribution: "© colaboradores de OpenStreetMap",
+    unavailable: "El mapa no está disponible. Revisa tu conexión.",
+    legend: {
+      high: "Corte anunciado",
+      medium: "Sin confirmar",
+      crowd: "Vecinos reportan",
+    },
   },
   settings: {
     title: "Ajustes",

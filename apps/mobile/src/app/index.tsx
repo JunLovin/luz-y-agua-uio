@@ -92,6 +92,11 @@ export default function Places() {
         );
       })}
       <Button label={es.places.add} onPress={() => router.push("/agregar")} />
+      <Button
+        label={es.map.open}
+        variant="secondary"
+        onPress={() => router.push("/mapa")}
+      />
       <Text style={[ui.muted, { textAlign: "center" }]}>{es.independence}</Text>
     </ScrollView>
   );

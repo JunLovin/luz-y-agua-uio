@@ -34,7 +34,8 @@
           "locationFullAccuracyPermission": false,
           "motionUsagePermission": false
         }
-      ]
+      ],
+      "@maplibre/maplibre-react-native"
     ],
     "scheme": "luzyaguauio"
   }

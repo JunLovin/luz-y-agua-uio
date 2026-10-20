@@ -3,6 +3,7 @@
   "main": "expo-router/entry",
   "dependencies": {
     "@luz-y-agua/shared": "workspace:*",
+    "@maplibre/maplibre-react-native": "^11.5.0",
     "expo": "~58.0.14",
     "expo-constants": "~58.0.12",
     "expo-dev-client": "~58.0.14",
@@ -19,6 +20,7 @@
     "react-native-screens": "~4.30.0"
   },
   "devDependencies": {
+    "@types/geojson": "^7946.0.16",
     "@types/react": "~19.3.0",
     "eslint-config-expo": "~58.0.4"
   },

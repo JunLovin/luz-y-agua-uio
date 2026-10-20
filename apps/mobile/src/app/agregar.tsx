@@ -9,13 +9,17 @@ import {
   searchBarrios,
 } from "../domain/barrios";
 import { addPlace } from "../domain/local-state";
+import { mapBarrios } from "../domain/map";
 import { es } from "../i18n/es";
+import { BaseMap } from "../ui/base-map";
 import { Button } from "../ui/button";
 import { localStore } from "../ui/local-store";
 import { colors, ui } from "../ui/theme";
 import { useCity } from "../ui/use-city";
 
 type Found = { barrioId: string; lat: number; lng: number };
+
+const NO_DATA = { outages: [], crowd: [], fetchedAt: "" };
 
 const newId = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -24,7 +28,9 @@ export default function AddPlace() {
   const router = useRouter();
   const city = useCity();
   const barrios = city.status === "ready" ? city.barrios : null;
-  const [mode, setMode] = useState<"choose" | "explain" | "confirm">("choose");
+  const [mode, setMode] = useState<"choose" | "explain" | "map" | "confirm">(
+    "choose",
+  );
   const [query, setQuery] = useState("");
   const [found, setFound] = useState<Found | null>(null);
   const [alias, setAlias] = useState("");
@@ -35,6 +41,10 @@ export default function AddPlace() {
     setFound(next);
     setMode("confirm");
   }
+  const outlines = useMemo(
+    () => (barrios ? mapBarrios(barrios, NO_DATA, "luz", new Date()) : null),
+    [barrios],
+  );
   const results = useMemo(
     () => (barrios ? searchBarrios(barrios, query) : []),
     [barrios, query],
@@ -81,6 +91,12 @@ export default function AddPlace() {
     choose({ barrioId, ...point });
   }
 
+  function pickOnMap([lng, lat]: [number, number]) {
+    const barrio = barrios && findBarrio(lat, lng, barrios);
+    if (!barrio) return setMessage(es.addPlace.outsideQuito);
+    choose({ barrioId: barrio.id, lat, lng });
+  }
+
   function save() {
     if (!found) return;
     const name = alias.trim() || barrioName(barrios, found.barrioId);
@@ -104,6 +120,24 @@ export default function AddPlace() {
           onPress={() => setMode("choose")}
         />
       </ScrollView>
+    );
+  }
+
+  if (mode === "map") {
+    return (
+      <View style={{ flex: 1 }}>
+        <Text style={[ui.body, { padding: 16 }]}>
+          {message ?? es.addPlace.pickOnMapHint}
+        </Text>
+        <BaseMap barrios={outlines} onPress={pickOnMap} />
+        <View style={{ padding: 16 }}>
+          <Button
+            label={es.common.cancel}
+            variant="secondary"
+            onPress={() => setMode("choose")}
+          />
+        </View>
+      </View>
     );
   }
 
@@ -148,6 +182,15 @@ export default function AddPlace() {
       <Button
         label={es.addPlace.useLocation}
         onPress={() => setMode("explain")}
+      />
+      <Button
+        label={es.addPlace.pickOnMap}
+        variant="secondary"
+        disabled={!barrios}
+        onPress={() => {
+          setMessage(null);
+          setMode("map");
+        }}
       />
       <Text style={ui.body}>{es.addPlace.searchLabel}</Text>
       <TextInput

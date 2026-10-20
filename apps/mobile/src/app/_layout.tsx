@@ -25,6 +25,7 @@ export default function RootLayout() {
         />
         <Stack.Screen name="lugar/[id]" options={{ title: "" }} />
         <Stack.Screen name="ajustes" options={{ title: es.settings.title }} />
+        <Stack.Screen name="mapa" options={{ title: es.map.title }} />
       </Stack>
       <StatusBar style="dark" />
     </>
