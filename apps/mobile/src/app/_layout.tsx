@@ -2,8 +2,10 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { es } from "../i18n/es";
 import { colors } from "../ui/theme";
+import { useTopicSync } from "../ui/use-topic-sync";
 
 export default function RootLayout() {
+  useTopicSync();
   return (
     <>
       <Stack

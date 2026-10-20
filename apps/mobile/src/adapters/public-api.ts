@@ -9,12 +9,15 @@ type Fetch = (
   init: { headers: Record<string, string>; signal: AbortSignal },
 ) => Promise<Response>;
 
+export type EeqZone = { id: string; name: string };
+type Api = PublicApi & { eeqZones(): Promise<EeqZone[]> };
+
 /** Reads the public views with the anon key. The paths are fixed: no barrio, no coordinates. */
 export function publicApi(
   baseUrl: string,
   anonKey: string,
   fetchFn: Fetch = fetch,
-): PublicApi {
+): Api {
   async function get<T>(
     url: string,
     headers: Record<string, string> = {},
@@ -49,10 +52,11 @@ export function publicApi(
         await view<{ version: number; url: string }[]>("public_barrios_meta")
       )[0] ?? null,
     barrios: (url) => get<BarriosGeoJson>(url),
+    eeqZones: () => view<EeqZone[]>("public_eeq_zones"),
   };
 }
 
-export function configuredPublicApi(): PublicApi {
+export function configuredPublicApi(): Api {
   const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
   const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key)

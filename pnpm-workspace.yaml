@@ -10,5 +10,7 @@ allowBuilds:
   lefthook: true
   sharp: false
   unrs-resolver: false
+  "@firebase/util": false
+  protobufjs: false
 
 nodeLinker: hoisted

@@ -6,6 +6,7 @@ import { removePlace } from "../../domain/local-state";
 import { es } from "../../i18n/es";
 import { formatOutageWindow } from "../../i18n/format";
 import { Button } from "../../ui/button";
+import { EeqZonePicker } from "../../ui/eeq-zone-picker";
 import { localStore, useLocalState } from "../../ui/local-store";
 import { colors, ui } from "../../ui/theme";
 import { useCity } from "../../ui/use-city";
@@ -104,6 +105,8 @@ export default function PlaceDetail() {
         />
       </View>
       <Text style={ui.muted}>{t.report.soon}</Text>
+
+      <EeqZonePicker place={place} />
 
       <Button label={t.remove} variant="danger" onPress={remove} />
     </ScrollView>

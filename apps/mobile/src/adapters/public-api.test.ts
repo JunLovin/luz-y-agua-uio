@@ -17,11 +17,13 @@ describe("publicApi", () => {
     await api.outages();
     await api.crowd();
     await api.barriosMeta();
+    await api.eeqZones();
     const urls = fetchFn.mock.calls.map(([url]) => url);
     expect(urls).toEqual([
       "https://x.supabase.co/rest/v1/public_outages_active?select=*",
       "https://x.supabase.co/rest/v1/public_crowd_live?select=*",
       "https://x.supabase.co/rest/v1/public_barrios_meta?select=*",
+      "https://x.supabase.co/rest/v1/public_eeq_zones?select=*",
     ]);
     for (const url of urls)
       expect(url).not.toMatch(/barrio_id|barrio=|lat|lng|lon/i);

@@ -47,6 +47,8 @@ export const es = {
     body: "Te avisaremos cuando se publique un corte en tus barrios y un rato antes de que empiece. No necesitamos saber quién eres: los avisos llegan por barrio.",
     allow: "Activar avisos",
     later: "Ahora no",
+    on: "Los avisos están activados.",
+    off: "Los avisos están desactivados. Actívalos para enterarte de los cortes en tus lugares.",
   },
   format: {
     openEnded: "en adelante",
@@ -104,6 +106,18 @@ export const es = {
       backAgua: "Volvió el agua",
       soon: "Los reportes de vecinos estarán disponibles pronto.",
     },
+    precision: {
+      title: "Precisión de luz (opcional)",
+      body: "Si tienes tu planilla de luz, consulta tu sector en la página de la EEQ y elígelo aquí. No guardamos tu número de suministro.",
+      open: "Consultar mi sector en la EEQ",
+      choose: "Elegir mi sector",
+      current: (name: string) => `Tu sector: ${name}`,
+      clear: "Quitar mi sector",
+      search: "Busca tu sector",
+      loading: "Cargando los sectores…",
+      error: "No se pudo descargar la lista de sectores.",
+      empty: "Todavía no hay sectores de la EEQ disponibles.",
+    },
     remove: "Borrar este lugar",
     removeConfirm: "¿Borrar este lugar? Dejarás de recibir sus avisos.",
   },
@@ -120,6 +134,7 @@ export const es = {
   },
   settings: {
     title: "Ajustes",
+    notifications: "Avisos",
     quietHours: "Horario silencioso",
     quietHoursBody:
       "Entre las 22:00 y las 06:00 no enviamos avisos anticipados; los dejamos para las 06:00. Los avisos de un corte inminente sí llegan.",

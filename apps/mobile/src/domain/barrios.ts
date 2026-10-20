@@ -11,19 +11,15 @@ function fold(text: string): string {
 }
 
 /** Local search by name (no geocoder, CLAUDE.md rule 11): names that start with the query first. */
-export function searchBarrios(
-  barrios: BarriosGeoJson,
+export function searchByName(
+  options: BarrioOption[],
   query: string,
   limit = 20,
 ): BarrioOption[] {
   const q = fold(query);
   if (!q) return [];
-  return barrios.features
-    .map(({ properties }) => ({
-      id: properties.id,
-      name: properties.name,
-      folded: fold(properties.name),
-    }))
+  return options
+    .map(({ id, name }) => ({ id, name, folded: fold(name) }))
     .filter((b) => b.folded.includes(q))
     .sort(
       (a, b) =>
@@ -32,6 +28,18 @@ export function searchBarrios(
     )
     .slice(0, limit)
     .map(({ id, name }) => ({ id, name }));
+}
+
+export function searchBarrios(
+  barrios: BarriosGeoJson,
+  query: string,
+  limit = 20,
+): BarrioOption[] {
+  return searchByName(
+    barrios.features.map(({ properties }) => properties),
+    query,
+    limit,
+  );
 }
 
 /** A point to draw a place chosen by name: the center of the barrio's largest ring's bounding box. */

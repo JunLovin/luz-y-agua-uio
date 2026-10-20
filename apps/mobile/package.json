@@ -4,7 +4,10 @@
   "dependencies": {
     "@luz-y-agua/shared": "workspace:*",
     "@maplibre/maplibre-react-native": "^11.5.0",
+    "@react-native-firebase/app": "^26.4.0",
+    "@react-native-firebase/messaging": "^26.4.0",
     "expo": "~58.0.14",
+    "expo-build-properties": "~58.0.11",
     "expo-constants": "~58.0.12",
     "expo-dev-client": "~58.0.14",
     "expo-linking": "~58.0.13",
@@ -12,6 +15,7 @@
     "expo-router": "~58.0.24",
     "expo-status-bar": "~58.0.3",
     "expo-system-ui": "~58.0.6",
+    "expo-web-browser": "~58.0.6",
     "react": "19.3.0",
     "react-native": "0.88.0",
     "react-native-mmkv": "^4.3.2",
