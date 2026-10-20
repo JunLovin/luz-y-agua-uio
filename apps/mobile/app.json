@@ -20,7 +20,22 @@
       "predictiveBackGestureEnabled": false,
       "package": "ec.luzyaguauio.app"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Luz y Agua UIO usa tu ubicación una sola vez para encontrar tu barrio. Tu ubicación nunca sale del teléfono.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false,
+          "locationAlwaysAndWhenInUsePermission": false,
+          "locationAlwaysPermission": false,
+          "locationFullAccuracyPermission": false,
+          "motionUsagePermission": false
+        }
+      ]
+    ],
     "scheme": "luzyaguauio"
   }
 }
