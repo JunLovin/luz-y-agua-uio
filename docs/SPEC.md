@@ -45,12 +45,12 @@ anónimos         │                                                           
 
 1. La app descarga `barrios.geojson` (público, versionado) y lo guarda localmente.
 2. El usuario marca un lugar (GPS en primer plano o tocando el mapa). La app calcula el `barrioId` con point-in-polygon **en el teléfono** y guarda `{ alias, barrioId, lat, lng }` **solo en MMKV**.
-3. La app se suscribe a los temas FCM de ese barrio (§6). El servidor nunca sabe quién está suscrito.
+3. Si el usuario activó los avisos, la app se suscribe a los temas FCM de ese barrio (§6). Sin permiso de notificaciones no se suscribe a nada: Google solo conoce un tema de barrio cuando el usuario pidió sus avisos. El servidor nunca sabe quién está suscrito.
 4. Al borrar un lugar, la app cancela las suscripciones que ya no use ningún otro lugar.
 
 **Mapas y búsqueda sin fugas de ubicación:**
 
-- Las teselas del mapa base se sirven desde **nuestro propio almacenamiento** (un archivo PMTiles de Quito generado con datos de OpenStreetMap, en Supabase Storage o Cloudflare R2). Nunca desde servidores de teselas de terceros: cada petición de tesela revela qué zona está mirando el usuario.
+- Las teselas del mapa base se sirven desde **nuestro propio almacenamiento**: el bucket público `tiles` de Supabase Storage guarda un extracto PMTiles de Quito (datos de OpenStreetMap, esquema Protomaps), el `style.json` y las fuentes Noto Sans en PBF. El estilo no usa sprites ni recursos externos; se publica con `pnpm --filter @luz-y-agua/scripts publish:basemap`. Nunca desde servidores de teselas de terceros: cada petición de tesela revela qué zona está mirando el usuario.
 - La búsqueda de barrios por nombre es **local**, sobre el GeoJSON descargado. No se usa ningún servicio externo de geocodificación (Nominatim, Google, Mapbox) desde la app.
 - El mapa muestra la atribución "© colaboradores de OpenStreetMap", obligatoria por la licencia ODbL.
 
@@ -210,7 +210,7 @@ create table rate_limits (
 create table notifications_log (
   id bigint generated always as identity primary key,
   topic text not null,
-  outage_id uuid,
+  outage_id uuid,                   -- en 'crowd', el id de crowd_outages
   kind text not null,               -- 'heads_up', 'imminent', 'correction', 'crowd'
   sent_at timestamptz not null default now()
 );
@@ -221,6 +221,7 @@ create table notifications_log (
 - `public_outages_active`: cortes con `tier in ('high','medium')` que terminan en el futuro o empezaron hace menos de 24 h. Se oculta un corte cuando lo reemplaza (`supersedes`) otro corte visible.
 - `public_crowd_live`: barrios con al menos 3 dispositivos (`dedup_hash` distintos) cuyo último reporte de los últimos 60 minutos es `out`. El conteo se redondea a múltiplos de 5 (§7).
 - `public_barrios_meta`: `version` y URL del GeoJSON vigente (la última fila de `barrios_releases`).
+- `public_eeq_zones`: `id` y `name` de todas las zonas de luz de la EEQ, para la precisión opcional (§8.3).
 
 Las vistas corren con los permisos de su dueño: `anon` y `authenticated` no tienen ningún permiso sobre las tablas, solo `select` sobre estas vistas. Las funciones de `public` tampoco se pueden ejecutar desde el cliente. Lo comprueban los tests pgTAP de `supabase/tests`.
 
@@ -339,7 +340,12 @@ La función `topicFor(service, scope, id)` vive en `packages/shared` y tiene tes
 - Programación con pg_cron + Edge Function `notify`, que llama a FCM HTTP v1 con una cuenta de servicio guardada como secreto.
 - Idempotencia: `notifications_log` evita mandar dos veces el mismo `(topic, outage_id, kind)`.
 - Horario silencioso: `heads_up` no se envía entre 22:00 y 06:00 (se agenda para las 06:00). `imminent`, `correction` y `crowd` sí se envían.
-- Payload sin datos personales: `{ service, outageId, barrioId, kind }` + título y texto.
+- Payload sin datos personales: `{ service, outageId, barrioId, kind }` (o `zoneId` en vez de `barrioId` para el tema de zona) + título y texto.
+- `notify` corre cada minuto. Solo anuncia cortes `high`; un corte reemplazado por una corrección visible no se anuncia.
+- Idempotencia en detalle: antes de cada envío, `notify` inserta la fila en `notifications_log`, que tiene un índice único `(topic, outage_id, kind)`. Si la fila ya existe, no envía; si FCM falla, borra la fila y se reintenta en la siguiente corrida.
+- Envío por condición FCM, nunca por token. Para un corte con zona EEQ, el tema de barrio va con `'v1_luz_b_X' in topics && !('v1_luz_z_Z' in topics)` y el de zona con `'v1_luz_z_Z' in topics`: quien sigue el barrio y la zona recibe un solo aviso.
+- `correction` va a los temas del corte nuevo y a los del corte anterior que ya recibieron aviso. No se envía si la nueva ventana ya terminó. Si el corte reemplazado nunca se notificó, el nuevo se anuncia como `heads_up` normal.
+- `crowd` se envía una vez por episodio de `crowd_outages` abierto y sin `matched_outage_id`.
 
 ---
 
@@ -377,12 +383,12 @@ La función `topicFor(service, scope, id)` vive en `packages/shared` y tiene tes
 ### 8.1 Pantallas
 
 1. **Bienvenida (3 pasos).** Qué hace la app; "App independiente, no afiliada a la EEQ ni a Epmaps"; confirmación de tener 15 años o más; aceptación de la política de privacidad (enlace a la web).
-2. **Permiso de notificaciones.** Explicación previa en una pantalla propia antes del diálogo del sistema.
+2. **Permiso de notificaciones.** Explicación previa en una pantalla propia, justo después de la bienvenida, antes del diálogo del sistema. Si el usuario dice "Ahora no", puede activarlos después en Ajustes.
 3. **Mis lugares.** Lista de lugares guardados con su estado actual (sin cortes / corte programado / vecinos reportan). Botón "Agregar lugar".
 4. **Agregar lugar.** Mapa centrado en Quito. Opciones: "Usar mi ubicación" (permiso solo en primer plano, se pide aquí, precedido de una pantalla propia que explica que la ubicación se usa una sola vez para encontrar el barrio y nunca sale del teléfono), tocar el mapa o buscar barrio por nombre (búsqueda local). Quien no quiera dar permiso de ubicación puede usar la app igual con las otras dos opciones. Se muestra el barrio detectado para confirmar y un alias ("Casa", "Trabajo").
 5. **Detalle del lugar.** Próximos cortes programados (luz y agua), fuente y hora de publicación de cada uno, estado de reportes de vecinos, botones grandes **"Se fue la luz" / "Volvió la luz"** y lo mismo para el agua.
-6. **Mapa en vivo.** Capa "Oficial" (cortes high y medium; medium con etiqueta "Sin confirmar") y capa "Vecinos" (barrios con reportes). Leyenda clara. Nunca puntos individuales.
-7. **Ajustes.** Precisión de luz opcional (§8.3), horario silencioso, ver política de privacidad, **"Borrar todos mis datos"** (borra MMKV y cancela todas las suscripciones), versión de la app, enlace al código en GitHub.
+6. **Mapa en vivo.** Selector Luz/Agua. Cada barrio se colorea según lo más fuerte que tenga para ese servicio: corte anunciado (high), "Sin confirmar" (medium) o "Vecinos reportan" (reportes). Leyenda clara. Nunca puntos individuales.
+7. **Ajustes.** Estado de los avisos (con botón para activarlos), horario silencioso, ver política de privacidad, **"Borrar todos mis datos"** (borra MMKV y cancela todas las suscripciones), versión de la app, enlace al código en GitHub.
 
 ### 8.2 Almacenamiento local (MMKV)
 
@@ -400,7 +406,6 @@ type LocalState = {
   subscribedTopics: string[];
   reportNonce: { date: string; value: string };
   lastReports: Record<string, string>; // clave `${barrioId}:${service}` → ISO
-  barriosVersion: number;
   ageConfirmed: boolean;
   privacyAcceptedVersion: number;
 };
@@ -408,9 +413,11 @@ type LocalState = {
 
 Las coordenadas se guardan solo para volver a dibujar el lugar en el mapa del propio teléfono. No se envían nunca.
 
+La ciudad descargada (cortes, reportes y el GeoJSON de barrios con su versión) se guarda aparte en MMKV, como caché; "Borrar todos mis datos" también la borra.
+
 ### 8.3 Precisión opcional de luz
 
-Para quien tiene su planilla: un botón abre el buscador oficial de la EEQ en el navegador del sistema (`expo-web-browser`). El usuario consulta su sector allí y luego lo elige de una lista local de `utility_zones` de la EEQ. La app se suscribe a `v1_luz_z_<zoneId>`. La app **no** lee la página de la EEQ ni guarda el número de suministro.
+Para quien tiene su planilla: un botón abre el buscador oficial de la EEQ en el navegador del sistema (`expo-web-browser`). El usuario consulta su sector allí y luego lo elige, en el detalle de cada lugar, de la lista completa de `public_eeq_zones` que la app descarga y filtra en el teléfono. La app se suscribe a `v1_luz_z_<zoneId>`. La app **no** lee la página de la EEQ ni guarda el número de suministro.
 
 ### 8.4 Calidad
 
@@ -418,6 +425,7 @@ Para quien tiene su planilla: un botón abre el buscador oficial de la EEQ en el
 - El GeoJSON de barrios se actualiza solo si cambia `public_barrios_meta.version`.
 - Accesibilidad: tamaños de texto dinámicos, contraste AA, etiquetas en botones de reporte.
 - Sin Expo Go: se usa dev client por Firebase.
+- Firebase solo con Messaging (`@react-native-firebase/app` y `messaging`): `apps/mobile/firebase.json` apaga la recolección automática de datos y Analytics. El token push no sale del SDK de FCM; la app solo se suscribe a temas.
 
 ---
 
@@ -478,7 +486,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ADMIN_EMAIL=
 ```
 
-En la app móvil solo van `SUPABASE_URL`, `SUPABASE_ANON_KEY` y los archivos de Firebase (`google-services.json`, `GoogleService-Info.plist`), que se cargan como secretos de EAS y **no** se versionan.
+En la app móvil solo van `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_WEB_URL` (para el enlace a la política de privacidad) y los archivos de Firebase (`google-services.json`, `GoogleService-Info.plist`), que se cargan como secretos de EAS y **no** se versionan.
 
 La sal para deduplicar reportes **no** es una variable de entorno: es aleatoria y vive en `daily_salts` (§7).
 
