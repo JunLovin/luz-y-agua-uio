@@ -45,9 +45,14 @@ jobs:
       - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         with:
           version: 2.117.0
-      - run: supabase start -x gotrue,realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      # gotrue stays: without it `supabase status` prints no anon key.
+      - run: supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
       - run: psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f supabase/ci/web-build.sql
-      - run: supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_ANON_KEY | grep -E '^SUPABASE_(URL|ANON_KEY)=' | sed -E 's/="(.*)"$/=\1/' >> "$GITHUB_ENV"
+      - run: |
+          supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_ANON_KEY \
+            | grep -E '^SUPABASE_(URL|ANON_KEY)=' | sed -E 's/="(.*)"$/=\1/' > supabase.env
+          test "$(wc -l < supabase.env)" -eq 2
+          cat supabase.env >> "$GITHUB_ENV"
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec turbo run build --filter=web
 
