@@ -95,11 +95,11 @@ export default function IngestPage({
   searchParams,
 }: PageProps<"/admin/ingesta">) {
   return (
-    <main>
+    <>
       <h1>{t.title}</h1>
       <Suspense fallback={<p>{t.loading}</p>}>
         <Panel searchParams={searchParams} />
       </Suspense>
-    </main>
+    </>
   );
 }

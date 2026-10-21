@@ -2,6 +2,13 @@ export const es = {
   appName: "Luz y Agua UIO",
   tagline: "Avisos de cortes de luz y agua en tu barrio de Quito.",
   independence: "App independiente, no afiliada a la EEQ ni a Epmaps.",
+  layout: {
+    skip: "Saltar al contenido",
+    nav: { luz: "Luz hoy", agua: "Agua hoy" },
+    legal: { privacy: "Privacidad", terms: "Términos", about: "Acerca" },
+    sources:
+      "Información de fuentes oficiales públicas y reportes anónimos de vecinos. Puede contener errores: ante una emergencia, llama al 911.",
+  },
   admin: {
     title: "Ingesta de documentos",
     loading: "Cargando…",
