@@ -54,6 +54,10 @@ export const config = {
     activeSourceDocuments: 3,
     activeSourceWindowMs: 14 * DAY_MS,
   },
+  web: {
+    /** Public pages are rebuilt at most this often; visits never hit the database (§9). */
+    revalidateMs: 5 * MINUTE_MS,
+  },
   mobile: {
     cityRefreshMs: 5 * MINUTE_MS,
     locationTimeoutMs: 15_000,
