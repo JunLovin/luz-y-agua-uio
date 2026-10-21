@@ -68,8 +68,8 @@ update reports set received_at = now() - interval '31 days' where dedup_hash = '
 
 select purge_expired_data();
 
-select is((select count(*)::int from daily_salts), 1, 'purges salts older than 48 hours');
-select is((select ip_hash from rate_limits), 'new', 'purges rate limit rows older than 1 hour');
+select is((select array_agg(salt) from daily_salts where salt in ('a', 'b')), '{b}'::bytea[], 'purges salts older than 48 hours');
+select is((select array_agg(ip_hash) from rate_limits where ip_hash in ('old', 'new')), '{new}', 'purges rate limit rows older than 1 hour');
 select is((select count(*)::int from notifications_log), 0, 'purges notifications older than 90 days');
 select is((select count(*)::int from reports where dedup_hash = 'r1'), 0, 'purges reports older than 30 days');
 

@@ -67,9 +67,11 @@ describe("SQL mirrors config.ts", () => {
       ),
     ].at(-1)?.[0];
     expect(view).toContain(
-      `round(count(*) / ${config.crowd.displayRoundTo}.0) * ${config.crowd.displayRoundTo}`,
+      `round(max(devices) / ${config.crowd.displayRoundTo}.0) * ${config.crowd.displayRoundTo}`,
     );
-    expect(view).toContain(`having count(*) >= ${config.crowd.displayMinimum}`);
+    expect(view).toContain(
+      `having max(devices) >= ${config.crowd.displayMinimum}`,
+    );
   });
 
   it("thresholds() for learning and alerts", () => {
@@ -89,6 +91,10 @@ describe("SQL mirrors config.ts", () => {
       silentSourceHours: config.alerts.silentSourceMs / 3_600_000,
       activeSourceDocuments: config.alerts.activeSourceDocuments,
       activeSourceWindowDays: config.alerts.activeSourceWindowMs / 86_400_000,
+      crowdEntryMinutes: config.crowd.entryWindowMs / 60_000,
+      crowdExitMinutes: config.crowd.exitWindowMs / 60_000,
+      crowdStaleHours: config.crowd.staleAfterMs / 3_600_000,
+      maxReportsPerIpPerHour: config.reports.maxPerIpPerHour,
     });
   });
 });

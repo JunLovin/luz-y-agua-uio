@@ -4,6 +4,7 @@ import {
   getMessaging,
   hasPermission,
   onMessage,
+  onNotificationOpenedApp,
   requestPermission,
   subscribeToTopic,
   unsubscribeFromTopic,
@@ -24,6 +25,7 @@ export const fcmPush: TopicPort & {
   requestPermission(): Promise<boolean>;
   reset(): Promise<void>;
   onMessage(listener: () => void): () => void;
+  onOpened(listener: () => void): () => void;
 } = {
   subscribe: (topic) => subscribeToTopic(messaging, topic),
   unsubscribe: (topic) => unsubscribeFromTopic(messaging, topic),
@@ -44,4 +46,5 @@ export const fcmPush: TopicPort & {
   /** Drops this install's token, and with it every topic subscription. */
   reset: () => deleteToken(messaging),
   onMessage: (listener) => onMessage(messaging, listener),
+  onOpened: (listener) => onNotificationOpenedApp(messaging, listener),
 };

@@ -1,5 +1,14 @@
 import { Redirect, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import type { Service } from "@luz-y-agua/shared";
+import * as Crypto from "expo-crypto";
+import { useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
+import { configuredReportApi } from "../../adapters/report-api";
+import {
+  submitReport,
+  type ReportOutcome,
+} from "../../application/submit-report";
+import type { ReportStatus } from "../../domain/reports";
 import { barrioName } from "../../domain/barrios";
 import { statusFor } from "../../domain/city";
 import { removePlace } from "../../domain/local-state";
@@ -9,13 +18,15 @@ import { Button } from "../../ui/button";
 import { EeqZonePicker } from "../../ui/eeq-zone-picker";
 import { localStore, useLocalState } from "../../ui/local-store";
 import { colors, ui } from "../../ui/theme";
-import { useCity } from "../../ui/use-city";
+import { refreshCityData, useCity } from "../../ui/use-city";
 
 export default function PlaceDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const local = useLocalState();
   const city = useCity();
+  const [sending, setSending] = useState(false);
+  const [reportMessage, setReportMessage] = useState<string | null>(null);
   const place = local.places.find((p) => p.id === id);
   if (!place) return <Redirect href="/" />;
 
@@ -40,6 +51,59 @@ export default function PlaceDetail() {
         },
       },
     ]);
+  }
+
+  const barrioId = place.barrioId;
+  const label = (service: Service, status: ReportStatus) =>
+    t.report[
+      `${status === "out" ? "out" : "back"}${service === "luz" ? "Luz" : "Agua"}`
+    ];
+
+  function messageFor(outcome: ReportOutcome): string {
+    switch (outcome.result) {
+      case "ok":
+        return t.report.sent;
+      case "cooldown":
+        return t.report.cooldown(Math.ceil(outcome.waitMs / 60_000));
+      case "rate_limited":
+        return t.report.rateLimited;
+      default:
+        return t.report.error;
+    }
+  }
+
+  async function send(service: Service, status: ReportStatus) {
+    setSending(true);
+    try {
+      const outcome = await submitReport(
+        localStore.get(),
+        { barrioId, service, status },
+        new Date(),
+        { send: configuredReportApi(), newNonce: Crypto.randomUUID },
+      );
+      localStore.update((state) => ({
+        ...state,
+        reportNonce: outcome.state.reportNonce,
+        lastReports: outcome.state.lastReports,
+      }));
+      setReportMessage(messageFor(outcome));
+      if (outcome.result === "ok") void refreshCityData();
+    } catch {
+      setReportMessage(t.report.error);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  function confirmReport(service: Service, status: ReportStatus) {
+    Alert.alert(
+      t.report.confirmTitle,
+      t.report.confirm(label(service, status), barrioName(barrios, barrioId)),
+      [
+        { text: es.common.cancel, style: "cancel" },
+        { text: t.report.send, onPress: () => void send(service, status) },
+      ],
+    );
   }
 
   return (
@@ -89,22 +153,23 @@ export default function PlaceDetail() {
 
       <Text style={ui.heading}>{t.report.title}</Text>
       <View style={{ gap: 8 }}>
-        <Button label={t.report.outLuz} onPress={() => undefined} disabled />
-        <Button
-          label={t.report.backLuz}
-          variant="secondary"
-          onPress={() => undefined}
-          disabled
-        />
-        <Button label={t.report.outAgua} onPress={() => undefined} disabled />
-        <Button
-          label={t.report.backAgua}
-          variant="secondary"
-          onPress={() => undefined}
-          disabled
-        />
+        {(["luz", "agua"] as const).flatMap((service) =>
+          (["out", "restored"] as const).map((status) => (
+            <Button
+              key={`${service}-${status}`}
+              label={label(service, status)}
+              variant={status === "out" ? "primary" : "secondary"}
+              disabled={sending}
+              onPress={() => confirmReport(service, status)}
+            />
+          )),
+        )}
       </View>
-      <Text style={ui.muted}>{t.report.soon}</Text>
+      {(sending || reportMessage) && (
+        <Text style={ui.body} accessibilityLiveRegion="polite">
+          {sending ? t.report.sending : reportMessage}
+        </Text>
+      )}
 
       <EeqZonePicker place={place} />
 

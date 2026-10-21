@@ -104,7 +104,16 @@ export const es = {
       backLuz: "Volvió la luz",
       outAgua: "Se fue el agua",
       backAgua: "Volvió el agua",
-      soon: "Los reportes de vecinos estarán disponibles pronto.",
+      confirmTitle: "¿Enviar reporte?",
+      confirm: (what: string, barrio: string) =>
+        `${what} en ${barrio}. Es anónimo: solo enviamos el barrio, el servicio y si se fue o volvió.`,
+      send: "Enviar",
+      sending: "Enviando…",
+      sent: "Gracias. Tu reporte se suma al de tus vecinos.",
+      cooldown: (minutes: number) =>
+        `Ya reportaste hace poco. Puedes volver a reportar en ${plural(minutes, "minuto", "minutos")}.`,
+      rateLimited: "Hay demasiados reportes desde tu red. Intenta más tarde.",
+      error: "No se pudo enviar el reporte. Revisa tu conexión.",
     },
     precision: {
       title: "Precisión de luz (opcional)",
