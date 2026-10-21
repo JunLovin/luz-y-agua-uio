@@ -178,6 +178,8 @@ create table reports (
   service text not null check (service in ('luz','agua')),
   status text not null check (status in ('out','restored')),
   dedup_hash text not null,         -- HMAC diario, ver §7
+  salt_day date not null,           -- día (hora de Ecuador) de la sal usada en dedup_hash
+  weight real not null default 1,   -- 0.5 si la atestación falla (§7, desde H7)
   received_at timestamptz not null default now()
 );
 
@@ -191,6 +193,7 @@ create table crowd_outages (
   peak_reports int not null,
   matched_outage_id uuid references outages(id)   -- si coincidió con un programado
 );
+-- A lo sumo un episodio abierto (ended_at null) por barrio y servicio.
 
 -- Sal aleatoria diaria para deduplicar reportes (se borra a las 48 h)
 create table daily_salts (
@@ -363,15 +366,17 @@ La función `topicFor(service, scope, id)` vive en `packages/shared` y tiene tes
 }
 ```
 
-- `nonce`: UUID aleatorio que el teléfono genera **una vez por día** y descarta al día siguiente.
+- `nonce`: UUID v4 aleatorio que el teléfono genera **una vez por día de Ecuador** y descarta al día siguiente. Es lo único que se envía, junto con el barrio, el servicio y el estado: la app no manda ningún otro campo.
 - El servidor calcula `dedup_hash = HMAC_SHA256(nonce, sal_del_día)`. La sal del día es **aleatoria** (tabla `daily_salts`), se crea a medianoche y se borra a las 48 h. No se deriva de ningún secreto fijo: si se pudiera recalcular, los hashes viejos dejarían de ser anónimos. Así se cuentan dispositivos distintos en un día sin poder seguir a nadie entre días.
-- `attestation`: Play Integrity (Android) / App Attest (iOS) para comprobar que es la app genuina. Si la verificación falla, el reporte se acepta con peso 0.5. Google y Apple procesan esta verificación; se declara en la política de privacidad.
-- Límite por IP: tabla `rate_limits` con `HMAC_SHA256(ip, sal_del_día)`, nunca la IP en claro, y filas borradas a la hora. Máximo 10 reportes por hora por IP. No se usan servicios externos (Upstash u otros) para esto.
-- Límite en el teléfono: un reporte por servicio y barrio cada 15 minutos.
+- `attestation`: Play Integrity (Android) / App Attest (iOS) para comprobar que es la app genuina. Si la verificación falla, el reporte se acepta con peso 0.5. Google y Apple procesan esta verificación; se declara en la política de privacidad. **Pendiente hasta H7** (requiere las cuentas de Play Console y Apple Developer): mientras tanto el campo se ignora y todo reporte pesa 1.
+- Límite por IP: tabla `rate_limits` con `HMAC_SHA256(ip, sal_del_día)`, nunca la IP en claro, y filas borradas a la hora. Máximo 10 reportes por hora de reloj por IP. No se usan servicios externos (Upstash u otros) para esto. La IP sale solo de cabeceras que ponen nuestros proxies (`cf-connecting-ip`, `x-real-ip` o el último valor de `x-forwarded-for`), porque el cliente puede anteponer lo que quiera a `x-forwarded-for`.
+- Todo ocurre en la función SQL `submit_report` en una sola transacción: crea la sal del día si falta, calcula los HMAC, aplica el límite e inserta. La Edge Function solo valida el cuerpo y responde `ok` (200), `invalid_report` (400), `unknown_barrio` (404) o `rate_limited` (429). No registra la IP ni el cuerpo.
+- Límite en el teléfono: un reporte por servicio y barrio cada 15 minutos (`lastReports`), y la app pide confirmación antes de enviar.
 
-**Agregación (`aggregate`, pg_cron cada minuto):**
+**Agregación (`aggregate_reports`, pg_cron cada minuto):**
 
-- Un barrio entra en `crowd_outages` cuando hay al menos `CROWD_MIN_DISTINCT` (por defecto 5) `dedup_hash` distintos con `status = 'out'` en 20 minutos.
+- **Conteo de dispositivos:** se toma el último estado de cada `dedup_hash` en la ventana y se suman los pesos **por día de sal**; vale el día con más dispositivos. Un teléfono que reporta antes y después de medianoche tiene dos hashes, pero cuenta una sola vez. Si hay error, es por contar de menos. `public_crowd_live` y el aprendizaje (`report_peaks`, §5.4) cuentan igual.
+- Un barrio entra en `crowd_outages` cuando hay al menos `CROWD_MIN_DISTINCT` (por defecto 5) dispositivos cuyo último estado en 20 minutos es `out`.
 - Sale cuando, en la ventana de 30 minutos, los `restored` superan a los `out`, o pasan 6 h sin reportes.
 - Si coincide con un corte programado del mismo servicio y barrio, se marca `matched_outage_id` y **no** se manda aviso `crowd` (ya hubo aviso oficial).
 - `public_crowd_live` muestra conteos redondeados a múltiplos de 5 y nunca menos de 3, para no exponer a nadie en un barrio pequeño.
