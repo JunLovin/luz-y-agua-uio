@@ -225,6 +225,7 @@ create table notifications_log (
 - `public_crowd_live`: barrios con al menos 3 dispositivos (`dedup_hash` distintos) cuyo último reporte de los últimos 60 minutos es `out`. El conteo se redondea a múltiplos de 5 (§7).
 - `public_barrios_meta`: `version` y URL del GeoJSON vigente (la última fila de `barrios_releases`).
 - `public_eeq_zones`: `id` y `name` de todas las zonas de luz de la EEQ, para la precisión opcional (§8.3).
+- `public_barrios`: `id` y `name` de todos los barrios, para la web (§9).
 
 Las vistas corren con los permisos de su dueño: `anon` y `authenticated` no tienen ningún permiso sobre las tablas, solo `select` sobre estas vistas. Las funciones de `public` tampoco se pueden ejecutar desde el cliente. Lo comprueban los tests pgTAP de `supabase/tests`.
 
@@ -438,11 +439,16 @@ Para quien tiene su planilla: un botón abre el buscador oficial de la EEQ en el
 
 - `/` — Landing con descarga de la app y estado general ("Hoy hay N cortes programados en Quito").
 - `/cortes-de-luz-quito-hoy` y `/cortes-de-agua-quito-hoy` — Páginas para Google con la lista del día por barrio, ISR cada 5 minutos, datos estructurados y fecha visible. Son las que atraen tráfico.
-- `/barrio/[id]` — Estado de un barrio.
+- `/barrio/[id]` — Estado de un barrio. Se prerenderizan todos los barrios de `public_barrios`; uno inexistente responde 404.
 - `/privacidad`, `/terminos`, `/acerca` — Textos legales y aviso de independencia.
 - `/admin/ingesta` — Panel protegido (Supabase Auth, solo el correo del mantenedor) para subir cronogramas.
 
 Rendimiento en picos: las páginas públicas se sirven desde caché de Vercel; la base no recibe tráfico por cada visita.
+
+- Next.js con Cache Components: las páginas y los datos llevan `'use cache'` con el perfil `city` de `next.config.ts` (`stale` y `revalidate` = `config.web.revalidateMs`, 5 min; `expire` 1 h). Se prerenderizan en el build y se regeneran en segundo plano (ISR). No se usa caché en memoria por instancia, que en serverless se pierde.
+- El build lee la base. Vercel necesita `SUPABASE_URL` y `SUPABASE_ANON_KEY` (la anon key, solo vistas públicas) en tiempo de build. El CI compila la web contra un Supabase local con datos mínimos (`supabase/ci/web-build.sql`).
+- Los nombres de barrio salen de la vista `public_barrios` (id y nombre, sin geometría).
+- `sitemap.xml` y `robots.txt` usan `NEXT_PUBLIC_SITE_URL`; `/admin` no se indexa. Las páginas de hoy llevan datos estructurados (`ItemList` de `Event`).
 
 Privacidad en la web: sin cookies salvo la sesión del panel de administración, sin Vercel Analytics ni Speed Insights, sin Google Analytics, sin píxeles ni fuentes cargadas desde terceros (las fuentes se sirven desde el propio dominio). Así no hace falta banner de cookies.
 
@@ -461,7 +467,7 @@ Privacidad en la web: sin cookies salvo la sesión del panel de administración,
 - Nuestros proveedores (Supabase, Vercel, Google) operan servidores fuera de Ecuador. Sus registros técnicos pueden incluir tu dirección IP por un tiempo limitado; configuramos la retención mínima disponible.
 - El mapa se sirve desde nuestro propio almacenamiento, no desde servicios de mapas de terceros.
 - Puedes borrar todo desde Ajustes. Como no guardamos datos que te identifiquen, no hay nada más que podamos borrar del servidor; si tienes una duda o quieres ejercer tus derechos de acceso, rectificación, eliminación u oposición, escríbenos al correo de contacto.
-- Contacto del responsable y fecha de la versión.
+- Contacto del responsable y fecha de la versión. El número de versión vive en `config.legal.privacyVersion`, compartido por la app (que pide aceptar de nuevo si sube) y la web.
 
 **Términos de uso:** la app informa con base en fuentes públicas y reportes anónimos, puede contener errores, no es un servicio de emergencias (ante una emergencia, 911 y canales oficiales), no está afiliada a la EEQ ni a Epmaps.
 
