@@ -1,3 +1,4 @@
+import { config } from "./config.ts";
 import type { Service } from "./topics.ts";
 
 export type ReportStatus = "out" | "restored";
@@ -43,4 +44,13 @@ export function clientIp(header: (name: string) => string | null): string {
     forwarded ||
     "unknown"
   );
+}
+
+const quitoDate = new Intl.DateTimeFormat("en-CA", {
+  timeZone: config.notifications.quietHours.timeZone,
+});
+
+/** "2026-10-21": the day in Quito. The phone's nonce and the server's salt both change with it. */
+export function quitoDay(now: Date): string {
+  return quitoDate.format(now);
 }

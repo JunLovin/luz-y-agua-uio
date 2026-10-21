@@ -14,6 +14,7 @@ export {
 export {
   clientIp,
   parseReport,
+  quitoDay,
   type ReportInput,
   type ReportStatus,
 } from "./reports.ts";

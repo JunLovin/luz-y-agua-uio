@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clientIp, parseReport } from "./reports.ts";
+import { clientIp, parseReport, quitoDay } from "./reports.ts";
 
 const valid = {
   barrioId: "la_argelia",
@@ -50,5 +50,12 @@ describe("clientIp", () => {
 
   it("falls back to a shared bucket", () => {
     expect(clientIp(headers({}))).toBe("unknown");
+  });
+});
+
+describe("quitoDay", () => {
+  it("uses the Quito date, not UTC", () => {
+    expect(quitoDay(new Date("2026-10-21T04:59:00Z"))).toBe("2026-10-20");
+    expect(quitoDay(new Date("2026-10-21T05:00:00Z"))).toBe("2026-10-21");
   });
 });
