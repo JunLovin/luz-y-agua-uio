@@ -113,6 +113,11 @@ h2 {
   gap: 0.5rem;
 }
 
+.card p,
+.card h3 {
+  margin: 0;
+}
+
 .list {
   list-style: none;
   margin: 0;
@@ -139,6 +144,10 @@ h2 {
 .site-footer .container {
   display: grid;
   gap: 0.5rem;
+}
+
+.site-footer p {
+  margin: 0;
 }
 
 .site-footer nav {

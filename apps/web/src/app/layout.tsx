@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { es } from "@/i18n/es";
+import { siteUrl } from "@/server/site-url";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
 export const metadata: Metadata = {
-  ...(siteUrl && { metadataBase: new URL(siteUrl) }),
+  metadataBase: new URL(siteUrl),
   title: { default: es.appName, template: `%s · ${es.appName}` },
   description: es.tagline,
   openGraph: { siteName: es.appName, locale: "es_EC", type: "website" },

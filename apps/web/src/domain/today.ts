@@ -8,6 +8,8 @@ import {
 
 export type DayOutage = {
   id: string;
+  startsAt: string;
+  endsAt: string | null;
   window: string;
   tier: PublicOutage["tier"];
   sourceLabel: string;
@@ -19,6 +21,18 @@ export type BarrioDay = {
   name: string;
   outages: DayOutage[];
 };
+
+export function toDayOutage(outage: PublicOutage, now: Date): DayOutage {
+  return {
+    id: outage.id,
+    startsAt: outage.starts_at,
+    endsAt: outage.ends_at,
+    window: outageWindow(outage.starts_at, outage.ends_at, now),
+    tier: outage.tier,
+    sourceLabel: outage.source_label,
+    notes: outage.notes,
+  };
+}
 
 /** Whether an outage touches the given Quito day; open-ended ones run until now. */
 export function onDay(outage: PublicOutage, day: string, now: Date): boolean {
@@ -51,13 +65,7 @@ export function todayByBarrio(
 ): BarrioDay[] {
   const byBarrio = new Map<string, DayOutage[]>();
   for (const outage of outagesToday(snapshot, service, now)) {
-    const entry: DayOutage = {
-      id: outage.id,
-      window: outageWindow(outage.starts_at, outage.ends_at, now),
-      tier: outage.tier,
-      sourceLabel: outage.source_label,
-      notes: outage.notes,
-    };
+    const entry = toDayOutage(outage, now);
     for (const barrioId of outage.barrio_ids) {
       byBarrio.set(barrioId, [...(byBarrio.get(barrioId) ?? []), entry]);
     }

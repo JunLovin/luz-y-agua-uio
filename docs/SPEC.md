@@ -486,8 +486,7 @@ FCM_PROJECT_ID=
 RESEND_API_KEY=                   # alarmas por correo (§5.6)
 ALERT_FROM_EMAIL=                 # opcional; por defecto el remitente de prueba de Resend
 # Web
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SITE_URL=             # dominio público: metadatos, sitemap y robots
 ADMIN_EMAIL=
 ```
 
