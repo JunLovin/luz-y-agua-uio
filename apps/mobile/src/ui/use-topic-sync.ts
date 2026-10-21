@@ -51,10 +51,13 @@ export function useTopicSync() {
     const subscription = AppState.addEventListener("change", (status) => {
       if (status === "active") void syncNow();
     });
-    const stop = fcmPush.onMessage(() => void refreshCityData());
+    // A push means the city changed: refresh now, not after the usual foreground delay.
+    const stopMessages = fcmPush.onMessage(() => void refreshCityData());
+    const stopOpened = fcmPush.onOpened(() => void refreshCityData());
     return () => {
       subscription.remove();
-      stop();
+      stopMessages();
+      stopOpened();
     };
   }, []);
 }
