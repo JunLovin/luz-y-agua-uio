@@ -167,3 +167,23 @@ label {
   display: grid;
   gap: 0.25rem;
 }
+
+.legal {
+  display: grid;
+  gap: 1rem;
+  max-width: 40rem;
+}
+
+.legal section {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.legal p {
+  margin: 0;
+}
+
+.legal .tag {
+  justify-self: start;
+  border-radius: var(--radius);
+}

@@ -1,3 +1,4 @@
+import { config } from "@luz-y-agua/shared";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { es } from "@/i18n/es";
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/privacidad">{t.legal.privacy}</Link>
               <Link href="/terminos">{t.legal.terms}</Link>
               <Link href="/acerca">{t.legal.about}</Link>
+              <a href={config.legal.sourceCodeUrl}>{t.sourceCode}</a>
             </nav>
           </div>
         </footer>

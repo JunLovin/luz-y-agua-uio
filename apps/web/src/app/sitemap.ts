@@ -14,6 +14,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "hourly" as const,
       priority: 0.9,
     })),
+    ...["/acerca", "/privacidad", "/terminos"].map((path) => ({
+      url: `${siteUrl}${path}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.3,
+    })),
     ...barrios.map((path) => ({
       url: `${siteUrl}${path}`,
       changeFrequency: "hourly" as const,
