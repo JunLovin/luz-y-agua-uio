@@ -54,6 +54,12 @@ export const config = {
     activeSourceDocuments: 3,
     activeSourceWindowMs: 14 * DAY_MS,
   },
+  legal: {
+    /** Bump with every change to /privacidad: the app asks everyone to accept it again. */
+    privacyVersion: 1,
+    privacyDate: "2026-10-21",
+    sourceCodeUrl: "https://github.com/JunLovin/luz-y-agua-uio",
+  },
   web: {
     /** Public pages are rebuilt at most this often; visits never hit the database (§9). */
     revalidateMs: 5 * MINUTE_MS,
