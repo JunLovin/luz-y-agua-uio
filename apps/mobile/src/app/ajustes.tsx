@@ -17,9 +17,9 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
-  Text,
   View,
 } from "react-native";
+import { Text } from "../ui/text";
 import { es } from "../i18n/es";
 import { Button } from "../ui/button";
 import { Card, IconBadge, OptionRow, Segmented } from "../ui/kit";
@@ -48,8 +48,9 @@ export default function Settings() {
   );
 
   async function toggleNotifications(enabled: boolean) {
-    const granted = await setNotifications(enabled);
-    if (!granted) return void Linking.openSettings();
+    const result = await setNotifications(enabled);
+    if (result === "blocked") return void Linking.openSettings();
+    if (result === "denied") return;
     setNotificationsOn(enabled);
   }
 

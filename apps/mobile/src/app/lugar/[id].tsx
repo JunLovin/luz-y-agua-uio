@@ -19,9 +19,10 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
+  useWindowDimensions,
   View,
 } from "react-native";
+import { Text } from "../../ui/text";
 import { configuredReportApi } from "../../adapters/report-api";
 import {
   submitReport,
@@ -47,6 +48,7 @@ export default function PlaceDetail() {
   const router = useRouter();
   const local = useLocalState();
   const city = useCity();
+  const stacked = useWindowDimensions().fontScale > 1.3;
   const [sending, setSending] = useState(false);
   const [reportMessage, setReportMessage] = useState<string | null>(null);
   const place = local.places.find((p) => p.id === id);
@@ -156,7 +158,7 @@ export default function PlaceDetail() {
       )}
 
       {city.status === "ready" && (
-        <View style={styles.tiles}>
+        <View style={[styles.tiles, stacked && styles.column]}>
           {(["luz", "agua"] as const).map((service) => {
             const alert = alerts.find((a) => a.service === service);
             const tone = !alert
@@ -247,7 +249,7 @@ export default function PlaceDetail() {
       <Text style={[ui.heading, { marginTop: space.sm }]}>
         {t.report.title}
       </Text>
-      <View style={styles.grid}>
+      <View style={[styles.grid, stacked && styles.column]}>
         {REPORTS.map(({ service, status: reportStatus, icon: Icon }) => {
           const tone = colors[service];
           return (
@@ -315,6 +317,7 @@ const styles = StyleSheet.create({
     gap: space.xs,
     minHeight: 132,
   },
+  column: { flexDirection: "column" },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
   report: {
     flexBasis: "47%",

@@ -13,9 +13,9 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
+import { Text } from "../ui/text";
 import {
   SafeAreaView,
   useSafeAreaInsets,

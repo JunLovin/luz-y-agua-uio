@@ -1,12 +1,7 @@
 import { ChevronRight, type LucideIcon } from "lucide-react-native";
 import type { ReactNode } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  type ViewStyle,
-} from "react-native";
+import { Pressable, StyleSheet, View, type ViewStyle } from "react-native";
+import { Text } from "./text";
 import { useTheme } from "./theme";
 import { radius, space, type, type Palette } from "./tokens";
 
@@ -61,6 +56,8 @@ export function IconBadge({
   const t = toneOf(colors, tone);
   return (
     <View
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
       style={{
         width: size,
         height: size,
@@ -192,7 +189,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: space.sm - 2,
-    borderRadius: radius.pill,
+    // A full pill on one line, a rounded card when large text wraps it.
+    borderRadius: 20,
     paddingVertical: 9,
     paddingHorizontal: 14,
     alignSelf: "flex-start",

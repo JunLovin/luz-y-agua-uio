@@ -1,7 +1,8 @@
 import type { Service } from "@luz-y-agua/shared";
 import { Droplet, Zap } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "../ui/text";
 import { mapBarrios } from "../domain/map";
 import { es } from "../i18n/es";
 import { BaseMap, statusColor } from "../ui/base-map";

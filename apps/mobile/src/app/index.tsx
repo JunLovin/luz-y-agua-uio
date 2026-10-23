@@ -1,5 +1,6 @@
 import { outageWindow } from "@luz-y-agua/shared";
 import { Redirect, useRouter } from "expo-router";
+import { useState } from "react";
 import {
   BellOff,
   ChevronRight,
@@ -15,7 +16,15 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react-native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { Text } from "../ui/text";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -68,6 +77,8 @@ export default function Places() {
   const city = useCity();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const stacked = useWindowDimensions().fontScale > 1.3;
+  const [dockHeight, setDockHeight] = useState(140);
   if (needsWelcome(local)) return <Redirect href="/bienvenida" />;
 
   const barrios = city.status === "ready" ? city.barrios : null;
@@ -79,7 +90,12 @@ export default function Places() {
       edges={["top"]}
       style={{ flex: 1, backgroundColor: colors.background }}
     >
-      <ScrollView contentContainerStyle={[ui.screen, { paddingBottom: 140 }]}>
+      <ScrollView
+        contentContainerStyle={[
+          ui.screen,
+          { paddingBottom: dockHeight + space.md },
+        ]}
+      >
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
             <Text style={ui.muted}>{formatToday(now)}</Text>
@@ -126,7 +142,11 @@ export default function Places() {
             <Button
               label={t.notificationsOff.action}
               variant="secondary"
-              onPress={() => void setNotifications(true)}
+              onPress={() =>
+                void setNotifications(true).then((result) => {
+                  if (result === "blocked") void Linking.openSettings();
+                })
+              }
             />
           </Card>
         )}
@@ -188,8 +208,10 @@ export default function Places() {
       </ScrollView>
 
       <View
+        onLayout={(e) => setDockHeight(e.nativeEvent.layout.height)}
         style={[
           styles.dock,
+          stacked && { flexDirection: "column" },
           {
             backgroundColor: colors.background,
             borderColor: colors.border,
@@ -197,14 +219,14 @@ export default function Places() {
           },
         ]}
       >
-        <View style={styles.flex}>
+        <View style={!stacked && styles.flex}>
           <Button
             label={t.add}
             icon={Plus}
             onPress={() => router.push("/agregar")}
           />
         </View>
-        <View style={styles.flex}>
+        <View style={!stacked && styles.flex}>
           <Button
             label={t.map}
             icon={MapIcon}

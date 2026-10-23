@@ -1,6 +1,7 @@
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
+import { Text } from "./text";
 import { configuredPublicApi, type EeqZone } from "../adapters/public-api";
 import { searchByName } from "../domain/barrios";
 import { addPlace, type Place } from "../domain/local-state";
@@ -77,6 +78,7 @@ export function EeqZonePicker({ place }: { place: Place }) {
       {picking && list.length > 0 && (
         <>
           <TextInput
+            maxFontSizeMultiplier={2}
             style={ui.input}
             value={query}
             onChangeText={setQuery}

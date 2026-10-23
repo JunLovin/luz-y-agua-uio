@@ -12,6 +12,8 @@ import {
 import { PermissionsAndroid, Platform } from "react-native";
 import type { TopicPort } from "../application/topic-sync";
 
+export type PermissionResult = "granted" | "denied" | "blocked";
+
 const messaging = getMessaging();
 const POST_NOTIFICATIONS = PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS;
 const androidAsks = Platform.OS === "android" && Number(Platform.Version) >= 33;
@@ -22,7 +24,8 @@ const allowed = (status: number) =>
 /** FCM by topic only: the app never sends its push token anywhere (CLAUDE.md rule 3). */
 export const fcmPush: TopicPort & {
   hasPermission(): Promise<boolean>;
-  requestPermission(): Promise<boolean>;
+  /** "blocked" means the phone will not ask again: only its settings can turn avisos on. */
+  requestPermission(): Promise<PermissionResult>;
   reset(): Promise<void>;
   onMessage(listener: () => void): () => void;
   onOpened(listener: () => void): () => void;
@@ -35,13 +38,16 @@ export const fcmPush: TopicPort & {
     return allowed(await hasPermission(messaging));
   },
   async requestPermission() {
-    if (Platform.OS === "android")
-      return (
-        !androidAsks ||
-        (await PermissionsAndroid.request(POST_NOTIFICATIONS)) ===
-          PermissionsAndroid.RESULTS.GRANTED
-      );
-    return allowed(await requestPermission(messaging));
+    if (Platform.OS === "android") {
+      if (!androidAsks) return "granted";
+      const result = await PermissionsAndroid.request(POST_NOTIFICATIONS);
+      if (result === PermissionsAndroid.RESULTS.GRANTED) return "granted";
+      return result === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+        ? "blocked"
+        : "denied";
+    }
+    // iOS asks only once; after a "no" only the Settings app can change it.
+    return allowed(await requestPermission(messaging)) ? "granted" : "blocked";
   },
   /** Drops this install's token, and with it every topic subscription. */
   reset: () => deleteToken(messaging),

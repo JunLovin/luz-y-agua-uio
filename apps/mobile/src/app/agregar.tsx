@@ -6,10 +6,10 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   View,
 } from "react-native";
+import { Text } from "../ui/text";
 import {
   Check,
   CircleX,
@@ -222,6 +222,7 @@ export default function AddPlace() {
           })}
         </View>
         <TextInput
+          maxFontSizeMultiplier={2}
           style={ui.input}
           value={alias}
           onChangeText={setAlias}
@@ -288,6 +289,7 @@ export default function AddPlace() {
       >
         <Search size={22} color={colors.muted} />
         <TextInput
+          maxFontSizeMultiplier={2}
           style={[ui.body, { flex: 1, paddingVertical: 14 }]}
           value={query}
           onChangeText={setQuery}
@@ -330,6 +332,8 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: space.md },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
   chip: {
+    minHeight: 48,
+    justifyContent: "center",
     borderRadius: radius.pill,
     borderWidth: 1.5,
     paddingHorizontal: space.md + 2,

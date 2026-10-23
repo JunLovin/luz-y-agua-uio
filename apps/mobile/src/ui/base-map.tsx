@@ -6,7 +6,8 @@ import {
 } from "@maplibre/maplibre-react-native";
 import type { FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { useState, type ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "./text";
 import type { MapBarrio } from "../domain/map";
 import { es } from "../i18n/es";
 import type { Service } from "@luz-y-agua/shared";
@@ -109,6 +110,7 @@ export function BaseMap({
         {children}
       </Map>
       <Text
+        maxFontSizeMultiplier={1.2}
         style={[
           styles.attribution,
           { color: colors.text, backgroundColor: colors.surface },
