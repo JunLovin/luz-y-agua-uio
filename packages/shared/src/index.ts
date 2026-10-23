@@ -19,8 +19,10 @@ export {
   type ReportStatus,
 } from "./reports.ts";
 export {
+  placeAlerts,
   statusFor,
   type BarrioStatus,
+  type PlaceAlert,
   type CitySnapshot,
   type CrowdLive,
   type PublicOutage,
