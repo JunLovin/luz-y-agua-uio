@@ -461,6 +461,8 @@ Rendimiento en picos: las páginas públicas se sirven desde caché de Vercel; l
 
 Privacidad en la web: sin cookies salvo la sesión del panel de administración, sin Vercel Analytics ni Speed Insights, sin Google Analytics, sin píxeles ni fuentes cargadas desde terceros (las fuentes se sirven desde el propio dominio). Así no hace falta banner de cookies.
 
+Diseño: la misma identidad "Volcán" de la app, oscura por defecto. El selector Oscuro / Claro / Automático del pie guarda la elección solo en ese navegador, en `localStorage` (no es una cookie ni sale del navegador), y un script mínimo la aplica antes de pintar. La fuente Atkinson Hyperlegible Next se sirve desde el propio dominio (`next/font/local`, con licencia OFL en `apps/web/src/fonts`).
+
 ---
 
 ## 10. Textos legales
