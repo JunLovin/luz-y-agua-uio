@@ -1,4 +1,6 @@
 import {
+  config,
+  mapInBatches,
   planNotifications,
   type NotifiableOutage,
   type SentNotification,
@@ -97,33 +99,37 @@ Deno.serve(async (request) => {
     const now = new Date();
     const plan = planNotifications({ ...(await loadInputs(now)), now });
     const send = fcmSender(projectId, account);
-    let sent = 0;
-    let failed = 0;
-    for (const notification of plan) {
-      const claim = await db
-        .from("notifications_log")
-        .insert({
-          topic: notification.topic,
-          outage_id: notification.outageId,
-          kind: notification.kind,
-        })
-        .select("id")
-        .single();
-      // 23505: another run already claimed it.
-      if (claim.error?.code === "23505") continue;
-      if (claim.error) throw claim.error;
-      try {
-        await send(notification);
-        sent++;
-      } catch (error) {
-        failed++;
-        console.error(
-          `notify ${notification.kind} failed:`,
-          error instanceof Error ? error.message : error,
-        );
-        await db.from("notifications_log").delete().eq("id", claim.data.id);
-      }
-    }
+    const outcomes = await mapInBatches(
+      plan,
+      config.notifications.sendConcurrency,
+      async (notification) => {
+        const claim = await db
+          .from("notifications_log")
+          .insert({
+            topic: notification.topic,
+            outage_id: notification.outageId,
+            kind: notification.kind,
+          })
+          .select("id")
+          .single();
+        // 23505: another run already claimed it.
+        if (claim.error?.code === "23505") return "skipped";
+        if (claim.error) throw claim.error;
+        try {
+          await send(notification);
+          return "sent";
+        } catch (error) {
+          console.error(
+            `notify ${notification.kind} failed:`,
+            error instanceof Error ? error.message : error,
+          );
+          await db.from("notifications_log").delete().eq("id", claim.data.id);
+          return "failed";
+        }
+      },
+    );
+    const sent = outcomes.filter((o) => o === "sent").length;
+    const failed = outcomes.filter((o) => o === "failed").length;
     return json({ sent, failed });
   } catch (error) {
     console.error(

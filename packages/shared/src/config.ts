@@ -38,6 +38,8 @@ export const config = {
   notifications: {
     headsUpMinLeadMs: 2 * HOUR_MS,
     imminentLeadMs: 30 * MINUTE_MS,
+    /** Pushes `notify` sends at once; FCM HTTP v1 handles far more, this keeps one run short and polite. */
+    sendConcurrency: 10,
     quietHours: { startHour: 22, endHour: 6, timeZone: "America/Guayaquil" },
   },
   learning: {

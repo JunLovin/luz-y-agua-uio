@@ -150,6 +150,19 @@ function message(
   };
 }
 
+/** Runs `fn` over `items` with at most `size` calls in flight, keeping the input order. */
+export async function mapInBatches<T, R>(
+  items: readonly T[],
+  size: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = [];
+  for (let i = 0; i < items.length; i += size) {
+    results.push(...(await Promise.all(items.slice(i, i + size).map(fn))));
+  }
+  return results;
+}
+
 /**
  * SPEC §6: which pushes are due now. Only `high` outages are announced; an outage replaced
  * by a visible correction is silent; `heads_up` waits out the quiet hours.
