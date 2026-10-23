@@ -46,6 +46,7 @@ export const es = {
     title: "Activa los avisos",
     body: "Te avisaremos cuando se publique un corte en tus barrios y un rato antes de que empiece. No necesitamos saber quién eres: los avisos llegan por barrio.",
     allow: "Activar avisos",
+    disable: "Desactivar avisos",
     later: "Ahora no",
     on: "Los avisos están activados.",
     off: "Los avisos están desactivados. Actívalos para enterarte de los cortes en tus lugares.",
