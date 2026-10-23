@@ -15,6 +15,14 @@ export type Palette = {
   agua: Tone;
   crowd: Tone;
   danger: Tone;
+  /** The onboarding illustration: ridges, buildings, unlit windows and the moon (or sun). */
+  scene: {
+    far: string;
+    near: string;
+    building: string;
+    window: string;
+    sky: string;
+  };
 };
 
 /** A service or status hue: `solid` for icons, fills and the map; `soft` + `text` for pills. */
@@ -33,6 +41,13 @@ export const dark: Palette = {
   agua: { solid: "#5AB8F0", soft: "#173348", text: "#A6D9F8" },
   crowd: { solid: "#B392F0", soft: "#33264A", text: "#D8C6F7" },
   danger: { solid: "#F87171", soft: "#4A1F1F", text: "#FCA5A5" },
+  scene: {
+    far: "#322A26",
+    near: "#26201D",
+    building: "#3E3430",
+    window: "#322A26",
+    sky: "#3E3430",
+  },
 };
 
 export const light: Palette = {
@@ -48,6 +63,13 @@ export const light: Palette = {
   agua: { solid: "#0369A1", soft: "#E0F2FE", text: "#075985" },
   crowd: { solid: "#6D28D9", soft: "#EDE6FB", text: "#5B21B6" },
   danger: { solid: "#B91C1C", soft: "#FDE8E8", text: "#991B1B" },
+  scene: {
+    far: "#DDD0C7",
+    near: "#CDBDB2",
+    building: "#B9A79B",
+    window: "#E9E1DB",
+    sky: "#FFD2B8",
+  },
 };
 
 export const radius = { sm: 12, md: 18, lg: 24, pill: 999 } as const;
