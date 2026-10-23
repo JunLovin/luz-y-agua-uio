@@ -1,6 +1,7 @@
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
+import { Text } from "./text";
 import { configuredPublicApi, type EeqZone } from "../adapters/public-api";
 import { searchByName } from "../domain/barrios";
 import { addPlace, type Place } from "../domain/local-state";
@@ -8,10 +9,11 @@ import { es } from "../i18n/es";
 import { Button } from "./button";
 import { eeqSearchUrl } from "./links";
 import { localStore } from "./local-store";
-import { colors, ui } from "./theme";
+import { useTheme } from "./theme";
 
 /** SPEC §8.3: the whole EEQ zone list is downloaded and searched on the phone. */
 export function EeqZonePicker({ place }: { place: Place }) {
+  const { colors, ui } = useTheme();
   const t = es.place.precision;
   const [zones, setZones] = useState<EeqZone[] | "error" | null>(null);
   const [picking, setPicking] = useState(false);
@@ -68,7 +70,7 @@ export function EeqZonePicker({ place }: { place: Place }) {
       )}
       {picking && zones === null && <Text style={ui.muted}>{t.loading}</Text>}
       {picking && zones === "error" && (
-        <Text style={[ui.muted, { color: colors.danger }]}>{t.error}</Text>
+        <Text style={[ui.muted, { color: colors.danger.text }]}>{t.error}</Text>
       )}
       {picking && Array.isArray(zones) && zones.length === 0 && (
         <Text style={ui.muted}>{t.empty}</Text>
@@ -76,6 +78,7 @@ export function EeqZonePicker({ place }: { place: Place }) {
       {picking && list.length > 0 && (
         <>
           <TextInput
+            maxFontSizeMultiplier={2}
             style={ui.input}
             value={query}
             onChangeText={setQuery}

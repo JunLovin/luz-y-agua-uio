@@ -50,7 +50,7 @@ anónimos         │                                                           
 
 **Mapas y búsqueda sin fugas de ubicación:**
 
-- Las teselas del mapa base se sirven desde **nuestro propio almacenamiento**: el bucket público `tiles` de Supabase Storage guarda un extracto PMTiles de Quito (datos de OpenStreetMap, esquema Protomaps), el `style.json` y las fuentes Noto Sans en PBF. El estilo no usa sprites ni recursos externos; se publica con `pnpm --filter @luz-y-agua/scripts publish:basemap`. Nunca desde servidores de teselas de terceros: cada petición de tesela revela qué zona está mirando el usuario.
+- Las teselas del mapa base se sirven desde **nuestro propio almacenamiento**: el bucket público `tiles` de Supabase Storage guarda un extracto PMTiles de Quito (datos de OpenStreetMap, esquema Protomaps), el `style.json` (claro), el `style-dark.json` (oscuro) y las fuentes Noto Sans en PBF. El estilo no usa sprites ni recursos externos; se publica con `pnpm --filter @luz-y-agua/scripts publish:basemap`. Nunca desde servidores de teselas de terceros: cada petición de tesela revela qué zona está mirando el usuario.
 - La búsqueda de barrios por nombre es **local**, sobre el GeoJSON descargado. No se usa ningún servicio externo de geocodificación (Nominatim, Google, Mapbox) desde la app.
 - El mapa muestra la atribución "© colaboradores de OpenStreetMap", obligatoria por la licencia ODbL.
 
@@ -388,8 +388,8 @@ La función `topicFor(service, scope, id)` vive en `packages/shared` y tiene tes
 
 ### 8.1 Pantallas
 
-1. **Bienvenida (3 pasos).** Qué hace la app; "App independiente, no afiliada a la EEQ ni a Epmaps"; confirmación de tener 15 años o más; aceptación de la política de privacidad (enlace a la web).
-2. **Permiso de notificaciones.** Explicación previa en una pantalla propia, justo después de la bienvenida, antes del diálogo del sistema. Si el usuario dice "Ahora no", puede activarlos después en Ajustes.
+1. **Bienvenida (4 pasos en un solo flujo).** Qué hace la app con "App independiente, no afiliada a la EEQ ni a Epmaps", confirmación de tener 15 años o más, aceptación de la política de privacidad (tres puntos con ícono y enlace a la web) y avisos. Sobre los pasos hay una ilustración de Quito bajo el Pichincha cuyas ventanas se encienden con el progreso.
+2. **Permiso de notificaciones.** Es el último paso de la bienvenida y explica los avisos antes del diálogo del sistema. Si el usuario dice "Ahora no", Mis lugares le muestra una tarjeta para activarlos y Ajustes tiene un interruptor. La app solo da los avisos por activados si el sistema concede el permiso, y abre los ajustes del teléfono solo cuando el sistema ya no vuelve a preguntar.
 3. **Mis lugares.** Lista de lugares guardados con su estado actual (sin cortes / corte programado / vecinos reportan). Botón "Agregar lugar".
 4. **Agregar lugar.** Mapa centrado en Quito. Opciones: "Usar mi ubicación" (permiso solo en primer plano, se pide aquí, precedido de una pantalla propia que explica que la ubicación se usa una sola vez para encontrar el barrio y nunca sale del teléfono), tocar el mapa o buscar barrio por nombre (búsqueda local). Quien no quiera dar permiso de ubicación puede usar la app igual con las otras dos opciones. Se muestra el barrio detectado para confirmar y un alias ("Casa", "Trabajo").
 5. **Detalle del lugar.** Próximos cortes programados (luz y agua), fuente y hora de publicación de cada uno, estado de reportes de vecinos, botones grandes **"Se fue la luz" / "Volvió la luz"** y lo mismo para el agua.
@@ -414,6 +414,8 @@ type LocalState = {
   lastReports: Record<string, string>; // clave `${barrioId}:${service}` → ISO
   ageConfirmed: boolean;
   privacyAcceptedVersion: number;
+  notificationsEnabled: boolean; // la elección del usuario; Android ≤ 12 nunca pide permiso
+  theme: "dark" | "light" | "system"; // oscuro por defecto
 };
 ```
 
@@ -431,6 +433,13 @@ Para quien tiene su planilla: un botón abre el buscador oficial de la EEQ en el
 - El GeoJSON de barrios se actualiza solo si cambia `public_barrios_meta.version`.
 - Accesibilidad: tamaños de texto dinámicos, contraste AA, etiquetas en botones de reporte.
 - Sin Expo Go: se usa dev client por Firebase.
+- Diseño "Volcán":
+  - Paleta oscura por defecto y una clara, con un test que verifica contraste AA en texto, botones, píldoras e íconos.
+  - El color codifica el servicio en toda la app (brasa para luz, celeste para agua, violeta para vecinos).
+  - Tipografía Atkinson Hyperlegible Next, empaquetada en la app.
+  - Botones de 56 pt e íconos lucide.
+- Letra grande: los títulos crecen hasta 1,4× y el resto hasta 2×. Con letra grande, los diseños lado a lado pasan a columna.
+- Se respeta "reducir movimiento" y los íconos decorativos se ocultan a los lectores de pantalla.
 - Firebase solo con Messaging (`@react-native-firebase/app` y `messaging`): `apps/mobile/firebase.json` apaga la recolección automática de datos y Analytics. El token push no sale del SDK de FCM; la app solo se suscribe a temas.
 
 ---

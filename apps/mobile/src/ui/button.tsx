@@ -1,62 +1,83 @@
-import { Pressable, StyleSheet, Text } from "react-native";
-import { colors } from "./theme";
+import * as Haptics from "expo-haptics";
+import type { LucideIcon } from "lucide-react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import { Text } from "./text";
+import { useTheme } from "./theme";
+import { radius, space, type } from "./tokens";
 
 type Props = {
   label: string;
   onPress: () => void;
-  variant?: "primary" | "secondary" | "danger";
+  variant?: "primary" | "secondary" | "ghost" | "danger";
+  icon?: LucideIcon;
   disabled?: boolean;
 };
 
+/** Pill buttons, 56 pt tall so they are easy to hit at any age. */
 export function Button({
   label,
   onPress,
   variant = "primary",
+  icon: Icon,
   disabled = false,
 }: Props) {
-  const filled = variant === "primary";
+  const { colors } = useTheme();
+  const look = {
+    primary: {
+      bg: colors.primary,
+      fg: colors.onPrimary,
+      border: colors.primary,
+    },
+    secondary: { bg: colors.raised, fg: colors.text, border: colors.border },
+    ghost: { bg: "transparent", fg: colors.luz.text, border: "transparent" },
+    danger: {
+      bg: colors.danger.soft,
+      fg: colors.danger.text,
+      border: colors.danger.soft,
+    },
+  }[variant];
+
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={label}
       accessibilityState={{ disabled }}
       disabled={disabled}
-      onPress={onPress}
+      onPress={() => {
+        if (variant === "primary" || variant === "danger")
+          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress();
+      }}
       style={({ pressed }) => [
         styles.base,
-        filled ? styles.primary : styles.outline,
-        variant === "danger" && styles.danger,
-        (pressed || disabled) && styles.dimmed,
+        { backgroundColor: look.bg, borderColor: look.border },
+        pressed && styles.pressed,
+        disabled && styles.disabled,
       ]}
     >
-      <Text
-        style={[
-          styles.label,
-          {
-            color: filled
-              ? colors.onPrimary
-              : variant === "danger"
-                ? colors.danger
-                : colors.primary,
-          },
-        ]}
-      >
-        {label}
-      </Text>
+      <View style={styles.row}>
+        {Icon && <Icon size={22} color={look.fg} strokeWidth={2.25} />}
+        <Text style={[styles.label, { color: look.fg }]}>{label}</Text>
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 48,
-    borderRadius: 10,
+    minHeight: 56,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    justifyContent: "center",
+    paddingHorizontal: space.lg,
+  },
+  row: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 16,
+    gap: space.sm,
   },
-  primary: { backgroundColor: colors.primary },
-  outline: { borderWidth: 1.5, borderColor: colors.primary },
-  danger: { borderColor: colors.danger },
-  dimmed: { opacity: 0.55 },
-  label: { fontSize: 16, fontWeight: "600" },
+  label: { ...type.label, fontFamily: type.heading.fontFamily, fontSize: 17 },
+  pressed: { transform: [{ scale: 0.98 }], opacity: 0.9 },
+  disabled: { opacity: 0.45 },
 });
