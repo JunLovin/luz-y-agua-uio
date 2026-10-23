@@ -38,6 +38,7 @@ function sanitize(saved: Record<string, unknown>): LocalState {
 
     ageConfirmed,
     privacyAcceptedVersion,
+    notificationsEnabled,
   } = saved;
   return {
     places: Array.isArray(places) ? places.filter(isPlace) : EMPTY_STATE.places,
@@ -61,6 +62,7 @@ function sanitize(saved: Record<string, unknown>): LocalState {
     privacyAcceptedVersion: isNumber(privacyAcceptedVersion)
       ? privacyAcceptedVersion
       : EMPTY_STATE.privacyAcceptedVersion,
+    notificationsEnabled: notificationsEnabled === true,
   };
 }
 

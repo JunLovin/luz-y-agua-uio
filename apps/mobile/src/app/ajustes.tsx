@@ -2,14 +2,17 @@ import Constants from "expo-constants";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Linking, ScrollView, Text, View } from "react-native";
-import { fcmPush } from "../adapters/fcm-push";
 import { es } from "../i18n/es";
 import { Button } from "../ui/button";
 import { localStore } from "../ui/local-store";
 import { resetCityData } from "../ui/use-city";
 import { privacyUrl, sourceCodeUrl } from "../ui/links";
 import { ui } from "../ui/theme";
-import { forgetPush, syncNow } from "../ui/use-topic-sync";
+import {
+  forgetPush,
+  pushEnabled,
+  setNotifications,
+} from "../ui/use-topic-sync";
 
 export default function Settings() {
   const router = useRouter();
@@ -18,15 +21,14 @@ export default function Settings() {
   const [notificationsOn, setNotificationsOn] = useState<boolean | null>(null);
   useFocusEffect(
     useCallback(() => {
-      void fcmPush.hasPermission().then(setNotificationsOn, () => undefined);
+      void pushEnabled().then(setNotificationsOn, () => undefined);
     }, []),
   );
 
-  async function enableNotifications() {
-    const granted = await fcmPush.requestPermission().catch(() => false);
+  async function toggleNotifications(enabled: boolean) {
+    const granted = await setNotifications(enabled);
     if (!granted) return void Linking.openSettings();
-    setNotificationsOn(true);
-    void syncNow();
+    setNotificationsOn(enabled);
   }
 
   function wipe() {
@@ -53,12 +55,15 @@ export default function Settings() {
           <Text style={ui.body}>
             {notificationsOn ? es.notifications.on : es.notifications.off}
           </Text>
-          {!notificationsOn && (
-            <Button
-              label={es.notifications.allow}
-              onPress={() => void enableNotifications()}
-            />
-          )}
+          <Button
+            label={
+              notificationsOn
+                ? es.notifications.disable
+                : es.notifications.allow
+            }
+            variant={notificationsOn ? "secondary" : "primary"}
+            onPress={() => void toggleNotifications(!notificationsOn)}
+          />
         </View>
       )}
       <View style={ui.card}>

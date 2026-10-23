@@ -1,19 +1,17 @@
 import { useRouter } from "expo-router";
 import { ScrollView, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fcmPush } from "../adapters/fcm-push";
 import { es } from "../i18n/es";
 import { Button } from "../ui/button";
 import { colors, ui } from "../ui/theme";
-import { syncNow } from "../ui/use-topic-sync";
+import { setNotifications } from "../ui/use-topic-sync";
 
 /** Explains the notifications before the system dialog (SPEC §8.1). */
 export default function NotificationsIntro() {
   const router = useRouter();
   const done = () => router.replace("/");
   async function allow() {
-    await fcmPush.requestPermission().catch(() => false);
-    void syncNow();
+    await setNotifications(true);
     done();
   }
   return (

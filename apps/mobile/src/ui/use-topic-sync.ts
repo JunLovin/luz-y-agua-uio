@@ -6,6 +6,22 @@ import { desiredTopics } from "../domain/local-state";
 import { localStore, useLocalState } from "./local-store";
 import { refreshCityData } from "./use-city";
 
+/** Avisos only when the user chose them and the system allows them. */
+export async function pushEnabled(): Promise<boolean> {
+  return (
+    localStore.get().notificationsEnabled && (await fcmPush.hasPermission())
+  );
+}
+
+/** Records the user's choice and brings subscriptions in line with it. */
+export async function setNotifications(enabled: boolean): Promise<boolean> {
+  localStore.update((state) => ({ ...state, notificationsEnabled: enabled }));
+  const granted =
+    !enabled || (await fcmPush.requestPermission().catch(() => false));
+  void syncNow();
+  return granted;
+}
+
 let running = false;
 let again = false;
 
@@ -21,7 +37,7 @@ export async function syncNow(): Promise<void> {
       const subscribed = await syncTopics(
         localStore.get(),
         fcmPush,
-        await fcmPush.hasPermission(),
+        await pushEnabled(),
       );
       if (subscribed.join() !== localStore.get().subscribedTopics.join())
         localStore.update((state) => ({
