@@ -17,7 +17,12 @@ export type LocalState = {
   lastReports: Record<string, string>;
   ageConfirmed: boolean;
   privacyAcceptedVersion: number;
+  /** The user's choice. On Android 12 and older the system never asks, so this is the only gate. */
+  notificationsEnabled: boolean;
+  theme: ThemePreference;
 };
+
+export type ThemePreference = "dark" | "light" | "system";
 
 export const EMPTY_STATE: LocalState = {
   places: [],
@@ -26,6 +31,8 @@ export const EMPTY_STATE: LocalState = {
   lastReports: {},
   ageConfirmed: false,
   privacyAcceptedVersion: 0,
+  notificationsEnabled: false,
+  theme: "dark",
 };
 
 export function addPlace(state: LocalState, place: Place): LocalState {

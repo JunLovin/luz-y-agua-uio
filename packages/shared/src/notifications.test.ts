@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   isQuietHour,
+  mapInBatches,
   outageWindow,
   planNotifications,
   type NotifiableOutage,
@@ -232,5 +233,21 @@ describe("planNotifications", () => {
         sent: [{ topic: "v1_agua_b_solanda", outageId: "c1", kind: "crowd" }],
       }),
     ).toEqual([]);
+  });
+});
+
+describe("mapInBatches", () => {
+  it("never runs more than the batch size at once and keeps the order", async () => {
+    let running = 0;
+    let peak = 0;
+    const result = await mapInBatches([1, 2, 3, 4, 5], 2, async (n) => {
+      running++;
+      peak = Math.max(peak, running);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      running--;
+      return n * 10;
+    });
+    expect(result).toEqual([10, 20, 30, 40, 50]);
+    expect(peak).toBe(2);
   });
 });

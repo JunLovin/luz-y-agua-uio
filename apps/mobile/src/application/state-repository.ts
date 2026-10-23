@@ -38,6 +38,8 @@ function sanitize(saved: Record<string, unknown>): LocalState {
 
     ageConfirmed,
     privacyAcceptedVersion,
+    notificationsEnabled,
+    theme,
   } = saved;
   return {
     places: Array.isArray(places) ? places.filter(isPlace) : EMPTY_STATE.places,
@@ -61,6 +63,11 @@ function sanitize(saved: Record<string, unknown>): LocalState {
     privacyAcceptedVersion: isNumber(privacyAcceptedVersion)
       ? privacyAcceptedVersion
       : EMPTY_STATE.privacyAcceptedVersion,
+    notificationsEnabled: notificationsEnabled === true,
+    theme:
+      theme === "dark" || theme === "light" || theme === "system"
+        ? theme
+        : EMPTY_STATE.theme,
   };
 }
 

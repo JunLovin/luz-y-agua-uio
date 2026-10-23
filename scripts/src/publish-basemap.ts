@@ -40,14 +40,23 @@ async function main() {
     }
   }
 
-  const style = buildStyle({
+  const urls = {
     tilesUrl: storage.getPublicUrl(tilesPath).data.publicUrl,
     glyphsBaseUrl: storage.getPublicUrl("fonts").data.publicUrl,
-  });
-  await upload("style.json", JSON.stringify(style), "application/json");
+  };
+  await upload(
+    "style.json",
+    JSON.stringify(buildStyle(urls)),
+    "application/json",
+  );
+  await upload(
+    "style-dark.json",
+    JSON.stringify(buildStyle({ ...urls, flavor: "dark" })),
+    "application/json",
+  );
 
   console.log(
-    `Published ${tilesPath}, ${glyphs} glyph files and ${storage.getPublicUrl("style.json").data.publicUrl}`,
+    `Published ${tilesPath}, ${glyphs} glyph files, style.json and style-dark.json`,
   );
 }
 

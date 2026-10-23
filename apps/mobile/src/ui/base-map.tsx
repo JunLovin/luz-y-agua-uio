@@ -6,32 +6,47 @@ import {
 } from "@maplibre/maplibre-react-native";
 import type { FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { useState, type ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "./text";
 import type { MapBarrio } from "../domain/map";
 import { es } from "../i18n/es";
-import { colors, ui } from "./theme";
+import type { Service } from "@luz-y-agua/shared";
+import { useTheme } from "./theme";
+import type { Palette } from "./tokens";
 
 /** Our own style in our own storage: no third-party tile, font or geocoding server (CLAUDE.md rule 11). */
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const styleUrl =
-  supabaseUrl && `${supabaseUrl}/storage/v1/object/public/tiles/style.json`;
+const styleUrl = (scheme: "dark" | "light") =>
+  supabaseUrl &&
+  `${supabaseUrl}/storage/v1/object/public/tiles/${scheme === "dark" ? "style-dark" : "style"}.json`;
 const QUITO: [number, number] = [-78.5, -0.22];
 
-export const statusColors = {
-  high: "#C2410C",
-  medium: "#FDBA74",
-  crowd: "#7C3AED",
-} as const;
+/** Announced cuts take the service's color, unconfirmed ones a lighter fill, reports the crowd color. */
+export function statusColor(
+  colors: Palette,
+  service: Service,
+  status: "high" | "medium" | "crowd",
+): string {
+  return status === "crowd" ? colors.crowd.solid : colors[service].solid;
+}
 
 type Props = {
   barrios: FeatureCollection<Polygon | MultiPolygon, MapBarrio> | null;
+  service?: Service;
   onPress?: (lngLat: [number, number]) => void;
   children?: ReactNode;
 };
 
-export function BaseMap({ barrios, onPress, children }: Props) {
+export function BaseMap({
+  barrios,
+  service = "luz",
+  onPress,
+  children,
+}: Props) {
+  const { colors, ui, scheme } = useTheme();
+  const url = styleUrl(scheme);
   const [failed, setFailed] = useState(false);
-  if (!styleUrl || failed) {
+  if (!url || failed) {
     return (
       <View style={[styles.container, styles.unavailable]}>
         <Text style={ui.muted}>{es.map.unavailable}</Text>
@@ -42,7 +57,7 @@ export function BaseMap({ barrios, onPress, children }: Props) {
     <View style={styles.container}>
       <Map
         style={styles.map}
-        mapStyle={styleUrl}
+        mapStyle={url}
         onDidFailLoadingMap={() => setFailed(true)}
         logo={false}
         attribution={false}
@@ -63,30 +78,46 @@ export function BaseMap({ barrios, onPress, children }: Props) {
                   "match",
                   ["get", "status"],
                   "high",
-                  statusColors.high,
+                  statusColor(colors, service, "high"),
                   "medium",
-                  statusColors.medium,
+                  statusColor(colors, service, "medium"),
                   "crowd",
-                  statusColors.crowd,
+                  statusColor(colors, service, "crowd"),
                   "#000000",
                 ],
-                "fill-opacity": ["match", ["get", "status"], "none", 0, 0.45],
+                "fill-opacity": [
+                  "match",
+                  ["get", "status"],
+                  "none",
+                  0,
+                  "medium",
+                  0.25,
+                  0.5,
+                ],
               }}
             />
             <Layer
               id="barrios-outline"
               type="line"
               paint={{
-                "line-color": colors.primary,
+                "line-color": colors.muted,
                 "line-width": 1,
-                "line-opacity": 0.6,
+                "line-opacity": 0.45,
               }}
             />
           </GeoJSONSource>
         )}
         {children}
       </Map>
-      <Text style={styles.attribution}>{es.map.attribution}</Text>
+      <Text
+        maxFontSizeMultiplier={1.2}
+        style={[
+          styles.attribution,
+          { color: colors.text, backgroundColor: colors.surface },
+        ]}
+      >
+        {es.map.attribution}
+      </Text>
     </View>
   );
 }
@@ -100,8 +131,6 @@ const styles = StyleSheet.create({
     left: 6,
     bottom: 6,
     fontSize: 11,
-    color: colors.text,
-    backgroundColor: "rgba(255,255,255,0.8)",
     paddingHorizontal: 4,
     borderRadius: 4,
   },

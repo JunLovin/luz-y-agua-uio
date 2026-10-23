@@ -1,10 +1,33 @@
 import { useEffect } from "react";
 import { AppState } from "react-native";
-import { fcmPush } from "../adapters/fcm-push";
+import { fcmPush, type PermissionResult } from "../adapters/fcm-push";
 import { syncTopics } from "../application/topic-sync";
 import { desiredTopics } from "../domain/local-state";
 import { localStore, useLocalState } from "./local-store";
 import { refreshCityData } from "./use-city";
+
+/** Avisos only when the user chose them and the system allows them. */
+export async function pushEnabled(): Promise<boolean> {
+  return (
+    localStore.get().notificationsEnabled && (await fcmPush.hasPermission())
+  );
+}
+
+/**
+ * Records the user's choice and brings subscriptions in line with it. Turning avisos on only
+ * sticks if the phone grants the permission; the result says whether it did.
+ */
+export async function setNotifications(
+  enabled: boolean,
+): Promise<PermissionResult> {
+  const result: PermissionResult = enabled
+    ? await fcmPush.requestPermission().catch(() => "denied" as const)
+    : "granted";
+  if (result === "granted")
+    localStore.update((state) => ({ ...state, notificationsEnabled: enabled }));
+  void syncNow();
+  return result;
+}
 
 let running = false;
 let again = false;
@@ -21,7 +44,7 @@ export async function syncNow(): Promise<void> {
       const subscribed = await syncTopics(
         localStore.get(),
         fcmPush,
-        await fcmPush.hasPermission(),
+        await pushEnabled(),
       );
       if (subscribed.join() !== localStore.get().subscribedTopics.join())
         localStore.update((state) => ({

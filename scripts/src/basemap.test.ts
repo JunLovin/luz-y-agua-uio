@@ -26,3 +26,22 @@ describe("buildStyle", () => {
     expect(JSON.stringify(style.layers)).toContain("name:es");
   });
 });
+
+describe("buildStyle dark flavor", () => {
+  it("uses darker colors with the same sources", () => {
+    const dark = buildStyle({
+      tilesUrl: "https://example.supabase.co/t.pmtiles",
+      glyphsBaseUrl: "https://example.supabase.co/fonts",
+      flavor: "dark",
+    });
+    expect(dark.sources).toEqual(
+      buildStyle({
+        tilesUrl: "https://example.supabase.co/t.pmtiles",
+        glyphsBaseUrl: "https://example.supabase.co/fonts",
+      }).sources,
+    );
+    const background = (s: typeof dark) =>
+      s.layers.find((l) => l.type === "background")?.paint;
+    expect(background(dark)).not.toEqual(background(style));
+  });
+});
