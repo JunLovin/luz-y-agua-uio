@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react-native";
+import { ChevronRight, type LucideIcon } from "lucide-react-native";
 import type { ReactNode } from "react";
 import {
   Pressable,
@@ -75,6 +75,46 @@ export function IconBadge({
   );
 }
 
+/** A tappable card row: icon, title, optional subtitle and a chevron. */
+export function OptionRow({
+  icon,
+  tone = "neutral",
+  title,
+  subtitle,
+  onPress,
+  disabled = false,
+}: {
+  icon: LucideIcon;
+  tone?: ToneName | "neutral";
+  title: string;
+  subtitle?: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
+  const { colors, ui } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [
+        ui.card,
+        styles.option,
+        pressed && { transform: [{ scale: 0.99 }], opacity: 0.92 },
+        disabled && { opacity: 0.45 },
+      ]}
+    >
+      <IconBadge icon={icon} tone={tone} />
+      <View style={{ flex: 1 }}>
+        <Text style={ui.heading}>{title}</Text>
+        {subtitle && <Text style={ui.muted}>{subtitle}</Text>}
+      </View>
+      <ChevronRight size={22} color={colors.muted} />
+    </Pressable>
+  );
+}
+
 /** One choice among a few, as large pill tabs. */
 export function Segmented<T extends string>({
   options,
@@ -82,7 +122,13 @@ export function Segmented<T extends string>({
   onChange,
   label,
 }: {
-  options: readonly { value: T; label: string; icon?: LucideIcon }[];
+  /** `color` tints the selected option, so a service keeps its own color. */
+  options: readonly {
+    value: T;
+    label: string;
+    icon?: LucideIcon;
+    color?: string;
+  }[];
   value: T;
   onChange: (value: T) => void;
   label: string;
@@ -94,7 +140,7 @@ export function Segmented<T extends string>({
       accessibilityLabel={label}
       style={[styles.segmented, { backgroundColor: colors.raised }]}
     >
-      {options.map(({ value: option, label: text, icon: Icon }) => {
+      {options.map(({ value: option, label: text, icon: Icon, color }) => {
         const selected = option === value;
         const fg = selected ? colors.onPrimary : colors.text;
         return (
@@ -105,7 +151,7 @@ export function Segmented<T extends string>({
             onPress={() => onChange(option)}
             style={[
               styles.segment,
-              selected && { backgroundColor: colors.primary },
+              selected && { backgroundColor: color ?? colors.primary },
             ]}
           >
             {Icon && <Icon size={18} color={fg} strokeWidth={2.25} />}
@@ -124,6 +170,7 @@ function toneOf(colors: Palette, tone: ToneName | "neutral") {
 }
 
 const styles = StyleSheet.create({
+  option: { flexDirection: "row", alignItems: "center", gap: space.md },
   segmented: {
     flexDirection: "row",
     borderRadius: radius.pill,

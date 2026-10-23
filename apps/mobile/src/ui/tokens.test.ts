@@ -15,8 +15,9 @@ describe.each([
     }
   });
 
-  it("keeps the primary button label readable", () => {
-    expect(contrast(p.onPrimary, p.primary)).toBeGreaterThanOrEqual(AA_TEXT);
+  it("keeps labels readable on the primary and service fills", () => {
+    for (const fill of [p.primary, p.luz.solid, p.agua.solid])
+      expect(contrast(p.onPrimary, fill)).toBeGreaterThanOrEqual(AA_TEXT);
   });
 
   it.each(["luz", "agua", "crowd", "danger"] as const)(
