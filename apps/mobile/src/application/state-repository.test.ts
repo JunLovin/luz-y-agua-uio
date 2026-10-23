@@ -22,6 +22,7 @@ describe("stateRepository", () => {
       ...EMPTY_STATE,
       ageConfirmed: true,
       notificationsEnabled: true,
+      theme: "system" as const,
     };
     repo.save(state);
     expect(repo.load()).toEqual(state);
@@ -57,6 +58,7 @@ describe("stateRepository", () => {
       lastReports: { "solanda:luz": "2026-10-20T10:00:00Z", bad: 1 },
       ageConfirmed: "yes",
       notificationsEnabled: "yes",
+      theme: "neon",
     };
     expect(
       stateRepository(

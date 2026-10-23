@@ -145,6 +145,8 @@ export const es = {
   settings: {
     title: "Ajustes",
     notifications: "Avisos",
+    theme: "Apariencia",
+    themes: { dark: "Oscuro", light: "Claro", system: "Automático" },
     quietHours: "Horario silencioso",
     quietHoursBody:
       "Entre las 22:00 y las 06:00 no enviamos avisos anticipados; los dejamos para las 06:00. Los avisos de un corte inminente sí llegan.",

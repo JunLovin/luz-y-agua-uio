@@ -14,7 +14,7 @@ import { es } from "../i18n/es";
 import { BaseMap } from "../ui/base-map";
 import { Button } from "../ui/button";
 import { localStore } from "../ui/local-store";
-import { colors, ui } from "../ui/theme";
+import { useTheme } from "../ui/theme";
 import { useCity } from "../ui/use-city";
 
 type Found = { barrioId: string; lat: number; lng: number };
@@ -25,6 +25,7 @@ const newId = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
 export default function AddPlace() {
+  const { colors, ui } = useTheme();
   const router = useRouter();
   const city = useCity();
   const barrios = city.status === "ready" ? city.barrios : null;
@@ -177,7 +178,7 @@ export default function AddPlace() {
       keyboardShouldPersistTaps="handled"
     >
       {message && (
-        <Text style={[ui.body, { color: colors.warning }]}>{message}</Text>
+        <Text style={[ui.body, { color: colors.luz.text }]}>{message}</Text>
       )}
       <Button
         label={es.addPlace.useLocation}

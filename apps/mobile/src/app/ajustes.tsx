@@ -1,13 +1,15 @@
 import Constants from "expo-constants";
+import { Moon, Smartphone, Sun } from "lucide-react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Linking, ScrollView, Text, View } from "react-native";
 import { es } from "../i18n/es";
 import { Button } from "../ui/button";
-import { localStore } from "../ui/local-store";
+import { Segmented } from "../ui/kit";
+import { localStore, useLocalState } from "../ui/local-store";
 import { resetCityData } from "../ui/use-city";
 import { privacyUrl, sourceCodeUrl } from "../ui/links";
-import { ui } from "../ui/theme";
+import { useTheme } from "../ui/theme";
 import {
   forgetPush,
   pushEnabled,
@@ -15,6 +17,8 @@ import {
 } from "../ui/use-topic-sync";
 
 export default function Settings() {
+  const { ui } = useTheme();
+  const theme = useLocalState().theme;
   const router = useRouter();
   const t = es.settings;
   const policy = privacyUrl;
@@ -66,6 +70,19 @@ export default function Settings() {
           />
         </View>
       )}
+      <View style={ui.card}>
+        <Text style={ui.heading}>{t.theme}</Text>
+        <Segmented
+          label={t.theme}
+          value={theme}
+          onChange={(next) => localStore.update((s) => ({ ...s, theme: next }))}
+          options={[
+            { value: "dark", label: t.themes.dark, icon: Moon },
+            { value: "light", label: t.themes.light, icon: Sun },
+            { value: "system", label: t.themes.system, icon: Smartphone },
+          ]}
+        />
+      </View>
       <View style={ui.card}>
         <Text style={ui.heading}>{t.quietHours}</Text>
         <Text style={ui.body}>{t.quietHoursBody}</Text>

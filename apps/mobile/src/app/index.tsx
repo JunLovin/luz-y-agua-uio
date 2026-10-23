@@ -7,7 +7,7 @@ import { es } from "../i18n/es";
 import { formatOutageWindow } from "../i18n/format";
 import { Button } from "../ui/button";
 import { useLocalState } from "../ui/local-store";
-import { colors, ui } from "../ui/theme";
+import { useTheme } from "../ui/theme";
 import { useCity } from "../ui/use-city";
 
 function alertText(alert: PlaceAlert): string {
@@ -21,6 +21,7 @@ function alertText(alert: PlaceAlert): string {
 }
 
 export default function Places() {
+  const { colors, ui } = useTheme();
   const local = useLocalState();
   const city = useCity();
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function Places() {
         <Text style={ui.muted}>{es.city.loading}</Text>
       )}
       {city.status === "error" && (
-        <Text style={[ui.muted, { color: colors.danger }]}>
+        <Text style={[ui.muted, { color: colors.danger.text }]}>
           {es.city.error}
         </Text>
       )}
@@ -82,7 +83,7 @@ export default function Places() {
               {alerts.map((alert) => (
                 <Text
                   key={alert.service}
-                  style={[ui.body, { color: colors.warning }]}
+                  style={[ui.body, { color: colors.crowd.text }]}
                 >
                   {alertText(alert)}
                 </Text>

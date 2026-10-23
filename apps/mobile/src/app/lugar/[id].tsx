@@ -17,10 +17,11 @@ import { formatOutageWindow } from "../../i18n/format";
 import { Button } from "../../ui/button";
 import { EeqZonePicker } from "../../ui/eeq-zone-picker";
 import { localStore, useLocalState } from "../../ui/local-store";
-import { colors, ui } from "../../ui/theme";
+import { useTheme } from "../../ui/theme";
 import { refreshCityData, useCity } from "../../ui/use-city";
 
 export default function PlaceDetail() {
+  const { colors, ui } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const local = useLocalState();
@@ -118,7 +119,7 @@ export default function PlaceDetail() {
         <Text style={ui.muted}>{es.city.loading}</Text>
       )}
       {city.status === "error" && (
-        <Text style={[ui.muted, { color: colors.danger }]}>
+        <Text style={[ui.muted, { color: colors.danger.text }]}>
           {es.city.error}
         </Text>
       )}
@@ -146,7 +147,7 @@ export default function PlaceDetail() {
         <Text style={ui.body}>{t.neighborsNone}</Text>
       )}
       {status?.crowd.map((c) => (
-        <Text key={c.service} style={[ui.body, { color: colors.warning }]}>
+        <Text key={c.service} style={[ui.body, { color: colors.crowd.text }]}>
           {t.neighborsCount(es.services[c.service], c.reports)}
         </Text>
       ))}

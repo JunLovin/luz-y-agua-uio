@@ -7,9 +7,10 @@ import { es } from "../i18n/es";
 import { Button } from "../ui/button";
 import { localStore } from "../ui/local-store";
 import { privacyUrl } from "../ui/links";
-import { colors, ui } from "../ui/theme";
+import { useTheme } from "../ui/theme";
 
 export default function Welcome() {
+  const { colors, ui } = useTheme();
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [intro, age, privacy] = es.welcome.steps;
