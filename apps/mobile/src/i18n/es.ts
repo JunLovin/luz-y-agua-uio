@@ -11,14 +11,11 @@ export const es = {
     cancel: "Cancelar",
     save: "Guardar",
     delete: "Borrar",
-    retry: "Reintentar",
   },
   city: {
     loading: "Descargando los cortes de Quito…",
     error: "No se pudieron descargar los datos. Revisa tu conexión.",
     offline: "Sin conexión: mostrando los últimos datos descargados.",
-    summary: (barrios: number, outages: number) =>
-      `${plural(barrios, "barrio", "barrios")} · ${plural(outages, "corte activo", "cortes activos")}`,
   },
   welcome: {
     stepLabel: (step: number, total: number) => `Paso ${step} de ${total}`,
@@ -49,35 +46,41 @@ export const es = {
     title: "¿Te avisamos?",
     body: "Te avisaremos cuando se publique un corte en tus barrios y un rato antes de que empiece. No necesitamos saber quién eres: los avisos llegan por barrio.",
     allow: "Activar avisos",
-    disable: "Desactivar avisos",
     later: "Ahora no",
-    on: "Los avisos están activados.",
-    off: "Los avisos están desactivados. Actívalos para enterarte de los cortes en tus lugares.",
-  },
-  format: {
-    openEnded: "en adelante",
+    on: "Te avisamos de los cortes en tus lugares.",
+    off: "Apagados. Actívalos para enterarte de los cortes.",
   },
   places: {
     title: "Mis lugares",
-    empty:
-      "Todavía no tienes lugares. Agrega tu casa o tu trabajo para recibir avisos.",
+    emptyTitle: "Agrega tu primer lugar",
+    emptyBody:
+      "Tu casa, tu trabajo o donde viven tus papás. Te avisamos de los cortes en cada barrio.",
     add: "Agregar lugar",
+    map: "Mapa",
     settings: "Ajustes",
+    open: (alias: string) => `Abrir ${alias}`,
     clear: "Sin cortes anunciados",
-    ongoing: (service: string) => `Corte de ${service.toLowerCase()} en curso`,
-    scheduled: (service: string, when: string) =>
-      `Corte de ${service.toLowerCase()}: ${when}`,
+    ongoing: (service: string) => `${service}: corte en curso`,
+    scheduled: (service: string, when: string) => `${service}: ${when}`,
     crowd: (service: string) =>
       `Vecinos reportan corte de ${service.toLowerCase()}`,
+    notificationsOff: {
+      title: "Los avisos están apagados",
+      body: "Actívalos para enterarte de los cortes sin abrir la app.",
+      action: "Activar avisos",
+    },
   },
   addPlace: {
     title: "Agregar lugar",
     useLocation: "Usar mi ubicación",
+    useLocationHint: "Una sola vez. No sale del teléfono.",
     pickOnMap: "Elegir en el mapa",
     pickOnMapHint: "Toca tu barrio en el mapa.",
-    searchLabel: "O busca tu barrio por nombre",
-    searchPlaceholder: "Ej.: Solanda, Cumbayá",
-    noResults: "No encontramos ese barrio.",
+    pickOnMapSubtitle: "Toca tu barrio en el mapa de Quito.",
+    searchLabel: "O busca tu barrio",
+    clearSearch: "Borrar búsqueda",
+    searchPlaceholder: "Solanda, Cumbayá, La Mena…",
+    noResults: "No encontramos ese barrio. Prueba con otro nombre.",
     locationTitle: "Usar tu ubicación una sola vez",
     locationBody:
       "La usamos solo para encontrar tu barrio en este momento. Tu ubicación nunca sale del teléfono y no la seguimos en segundo plano.",
@@ -89,17 +92,21 @@ export const es = {
       "Tu ubicación está fuera de los barrios de Quito que conocemos.",
     barriosMissing:
       "Todavía no se descargaron los barrios. Revisa tu conexión.",
-    found: (barrio: string) => `Tu lugar está en ${barrio}.`,
-    aliasLabel: "Nombre del lugar",
-    aliasPlaceholder: "Casa, Trabajo…",
+    found: (barrio: string) => `Tu lugar está en ${barrio}`,
+    aliasLabel: "¿Cómo lo llamamos?",
+    aliasPlaceholder: "Casa de la abuela",
+    aliasSuggestions: ["Casa", "Trabajo", "Familia"],
   },
   place: {
+    now: {
+      clear: "Sin cortes anunciados",
+      ongoing: "Corte en curso",
+      crowd: "Vecinos reportan corte",
+    },
     upcoming: "Próximos cortes",
-    none: "No hay cortes anunciados para este barrio.",
     unconfirmed: "Sin confirmar",
     source: (label: string) => `Fuente: ${label}`,
     neighbors: "Reportes de vecinos",
-    neighborsNone: "Nadie reporta cortes en este momento.",
     neighborsCount: (service: string, reports: number) =>
       `${service}: ${plural(reports, "vecino reporta", "vecinos reportan")} corte`,
     report: {
@@ -150,9 +157,8 @@ export const es = {
     notifications: "Avisos",
     theme: "Apariencia",
     themes: { dark: "Oscuro", light: "Claro", system: "Automático" },
-    quietHours: "Horario silencioso",
     quietHoursBody:
-      "Entre las 22:00 y las 06:00 no enviamos avisos anticipados; los dejamos para las 06:00. Los avisos de un corte inminente sí llegan.",
+      "De 22:00 a 06:00 guardamos los avisos anticipados para la mañana. Los de un corte que está por empezar sí llegan.",
     privacy: "Política de privacidad",
     code: "Código abierto en GitHub",
     version: (version: string) => `Versión ${version}`,

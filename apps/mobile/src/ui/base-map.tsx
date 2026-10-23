@@ -99,9 +99,9 @@ export function BaseMap({
               id="barrios-outline"
               type="line"
               paint={{
-                "line-color": colors.primary,
+                "line-color": colors.muted,
                 "line-width": 1,
-                "line-opacity": 0.6,
+                "line-opacity": 0.45,
               }}
             />
           </GeoJSONSource>

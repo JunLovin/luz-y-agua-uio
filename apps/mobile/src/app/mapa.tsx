@@ -1,10 +1,13 @@
 import type { Service } from "@luz-y-agua/shared";
+import { Droplet, Zap } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { mapBarrios } from "../domain/map";
 import { es } from "../i18n/es";
 import { BaseMap, statusColor } from "../ui/base-map";
+import { Segmented } from "../ui/kit";
 import { useTheme } from "../ui/theme";
+import { radius, space } from "../ui/tokens";
 import { useCity } from "../ui/use-city";
 
 export default function LiveMap() {
@@ -23,42 +26,42 @@ export default function LiveMap() {
         : null,
     [city, service, now],
   );
+  const floating = {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+  };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={[styles.toggle, { backgroundColor: colors.background }]}
-        accessibilityRole="tablist"
-      >
-        {(["luz", "agua"] as const).map((option) => (
-          <Pressable
-            key={option}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: service === option }}
-            onPress={() => setService(option)}
-            style={[
-              styles.tab,
-              { borderColor: colors.primary },
-              service === option && { backgroundColor: colors.primary },
-            ]}
-          >
-            <Text
-              style={[
-                ui.body,
-                service === option && { color: colors.onPrimary },
-              ]}
-            >
-              {es.services[option]}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-      {(city.status === "error" ||
-        (city.status === "ready" && !city.barrios)) && (
-        <Text style={[ui.muted, { padding: 12 }]}>{es.map.unavailable}</Text>
-      )}
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <BaseMap barrios={barrios} service={service} />
-      <View style={[styles.legend, { backgroundColor: colors.background }]}>
+      <View style={[styles.top, styles.float, floating]}>
+        <Segmented
+          label={es.map.title}
+          value={service}
+          onChange={setService}
+          options={[
+            {
+              value: "luz",
+              label: es.services.luz,
+              icon: Zap,
+              color: colors.luz.solid,
+            },
+            {
+              value: "agua",
+              label: es.services.agua,
+              icon: Droplet,
+              color: colors.agua.solid,
+            },
+          ]}
+        />
+        {(city.status === "error" ||
+          (city.status === "ready" && !city.barrios)) && (
+          <Text style={[ui.muted, { textAlign: "center" }]}>
+            {es.map.unavailable}
+          </Text>
+        )}
+      </View>
+      <View style={[styles.legend, styles.float, floating]}>
         {(["high", "medium", "crowd"] as const).map((status) => (
           <View key={status} style={styles.legendItem}>
             <View
@@ -79,23 +82,23 @@ export default function LiveMap() {
 }
 
 const styles = StyleSheet.create({
-  toggle: {
-    flexDirection: "row",
-    gap: 8,
-    padding: 12,
+  float: {
+    position: "absolute",
+    left: space.md,
+    right: space.md,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    padding: space.sm,
   },
-  tab: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: 10,
-    borderRadius: 999,
-    borderWidth: 1.5,
-  },
+  top: { top: space.md, gap: space.xs },
   legend: {
+    bottom: space.xl,
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-around",
-    padding: 12,
+    gap: space.sm,
+    paddingVertical: space.md,
   },
-  legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
-  swatch: { width: 14, height: 14, borderRadius: 3 },
+  legendItem: { flexDirection: "row", alignItems: "center", gap: space.xs },
+  swatch: { width: 16, height: 16, borderRadius: 5 },
 });

@@ -45,7 +45,10 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.background },
         }}
       >
-        <Stack.Screen name="index" options={{ title: es.places.title }} />
+        <Stack.Screen
+          name="index"
+          options={{ title: es.places.title, headerShown: false }}
+        />
         <Stack.Screen name="bienvenida" options={{ headerShown: false }} />
         <Stack.Screen
           name="agregar"

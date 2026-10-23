@@ -2,7 +2,23 @@ import { config, findBarrio } from "@luz-y-agua/shared";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import {
+  Check,
+  CircleX,
+  LocateFixed,
+  MapPin,
+  MapPinned,
+  Search,
+  TriangleAlert,
+} from "lucide-react-native";
 import {
   barrioName,
   representativePoint,
@@ -13,8 +29,10 @@ import { mapBarrios } from "../domain/map";
 import { es } from "../i18n/es";
 import { BaseMap } from "../ui/base-map";
 import { Button } from "../ui/button";
+import { Card, IconBadge, OptionRow } from "../ui/kit";
 import { localStore } from "../ui/local-store";
 import { useTheme } from "../ui/theme";
+import { radius, space } from "../ui/tokens";
 import { useCity } from "../ui/use-city";
 
 type Found = { barrioId: string; lat: number; lng: number };
@@ -26,6 +44,7 @@ const newId = () =>
 
 export default function AddPlace() {
   const { colors, ui } = useTheme();
+  const t = es.addPlace;
   const router = useRouter();
   const city = useCity();
   const barrios = city.status === "ready" ? city.barrios : null;
@@ -33,6 +52,7 @@ export default function AddPlace() {
     "choose",
   );
   const [query, setQuery] = useState("");
+  const searching = query.trim() !== "";
   const [found, setFound] = useState<Found | null>(null);
   const [alias, setAlias] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -109,29 +129,46 @@ export default function AddPlace() {
 
   if (mode === "explain") {
     return (
-      <ScrollView contentContainerStyle={ui.screen}>
-        <Text style={ui.title} accessibilityRole="header">
-          {es.addPlace.locationTitle}
+      <ScrollView contentContainerStyle={[ui.screen, styles.centered]}>
+        <IconBadge icon={LocateFixed} tone="luz" size={72} />
+        <Text style={[ui.title, styles.center]} accessibilityRole="header">
+          {t.locationTitle}
         </Text>
-        <Text style={ui.body}>{es.addPlace.locationBody}</Text>
-        <Button label={es.common.continue} onPress={() => void locate()} />
-        <Button
-          label={es.common.cancel}
-          variant="secondary"
-          onPress={() => setMode("choose")}
-        />
+        <Text style={[ui.body, styles.center, { color: colors.muted }]}>
+          {t.locationBody}
+        </Text>
+        <View style={styles.actions}>
+          <Button
+            label={es.common.continue}
+            icon={LocateFixed}
+            onPress={() => void locate()}
+          />
+          <Button
+            label={es.common.cancel}
+            variant="ghost"
+            onPress={() => setMode("choose")}
+          />
+        </View>
       </ScrollView>
     );
   }
 
   if (mode === "map") {
     return (
-      <View style={{ flex: 1 }}>
-        <Text style={[ui.body, { padding: 16 }]}>
-          {message ?? es.addPlace.pickOnMapHint}
-        </Text>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
         <BaseMap barrios={outlines} onPress={pickOnMap} />
-        <View style={{ padding: 16 }}>
+        <View
+          style={[
+            styles.floatTop,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <MapPinned size={22} color={colors.primary} />
+          <Text style={[ui.label, { flex: 1 }]}>
+            {message ?? t.pickOnMapHint}
+          </Text>
+        </View>
+        <View style={styles.floatBottom}>
           <Button
             label={es.common.cancel}
             variant="secondary"
@@ -148,26 +185,59 @@ export default function AddPlace() {
         contentContainerStyle={ui.screen}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={ui.heading}>
-          {es.addPlace.found(barrioName(barrios, found.barrioId))}
-        </Text>
-        <Text style={ui.body}>{es.addPlace.aliasLabel}</Text>
+        <View style={styles.centered}>
+          <IconBadge icon={MapPin} tone="luz" size={72} />
+          <Text style={[ui.title, styles.center]} accessibilityRole="header">
+            {t.found(barrioName(barrios, found.barrioId))}
+          </Text>
+        </View>
+        <Text style={ui.label}>{t.aliasLabel}</Text>
+        <View style={styles.chips}>
+          {t.aliasSuggestions.map((suggestion) => {
+            const selected = alias === suggestion;
+            return (
+              <Pressable
+                key={suggestion}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                onPress={() => setAlias(suggestion)}
+                style={[
+                  styles.chip,
+                  {
+                    backgroundColor: selected ? colors.primary : colors.raised,
+                    borderColor: selected ? colors.primary : colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    ui.label,
+                    { color: selected ? colors.onPrimary : colors.text },
+                  ]}
+                >
+                  {suggestion}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
         <TextInput
           style={ui.input}
           value={alias}
           onChangeText={setAlias}
-          placeholder={es.addPlace.aliasPlaceholder}
+          placeholder={t.aliasPlaceholder}
           placeholderTextColor={colors.muted}
-          accessibilityLabel={es.addPlace.aliasLabel}
+          accessibilityLabel={t.aliasLabel}
           maxLength={40}
-          autoFocus
         />
-        <Button label={es.common.save} onPress={save} />
-        <Button
-          label={es.common.cancel}
-          variant="secondary"
-          onPress={() => setMode("choose")}
-        />
+        <View style={styles.actions}>
+          <Button label={es.common.save} icon={Check} onPress={save} />
+          <Button
+            label={es.common.cancel}
+            variant="ghost"
+            onPress={() => setMode("choose")}
+          />
+        </View>
       </ScrollView>
     );
   }
@@ -177,48 +247,118 @@ export default function AddPlace() {
       contentContainerStyle={ui.screen}
       keyboardShouldPersistTaps="handled"
     >
-      {message && (
-        <Text style={[ui.body, { color: colors.luz.text }]}>{message}</Text>
+      {!searching && (
+        <>
+          {message && (
+            <Card style={styles.row}>
+              <IconBadge icon={TriangleAlert} tone="danger" />
+              <Text style={[ui.body, { flex: 1 }]}>{message}</Text>
+            </Card>
+          )}
+          <OptionRow
+            icon={LocateFixed}
+            tone="luz"
+            title={t.useLocation}
+            subtitle={t.useLocationHint}
+            onPress={() => setMode("explain")}
+          />
+          <OptionRow
+            icon={MapPinned}
+            tone="agua"
+            title={t.pickOnMap}
+            subtitle={t.pickOnMapSubtitle}
+            disabled={!barrios}
+            onPress={() => {
+              setMessage(null);
+              setMode("map");
+            }}
+          />
+        </>
       )}
-      <Button
-        label={es.addPlace.useLocation}
-        onPress={() => setMode("explain")}
-      />
-      <Button
-        label={es.addPlace.pickOnMap}
-        variant="secondary"
-        disabled={!barrios}
-        onPress={() => {
-          setMessage(null);
-          setMode("map");
-        }}
-      />
-      <Text style={ui.body}>{es.addPlace.searchLabel}</Text>
-      <TextInput
-        style={ui.input}
-        value={query}
-        onChangeText={setQuery}
-        placeholder={es.addPlace.searchPlaceholder}
-        placeholderTextColor={colors.muted}
-        accessibilityLabel={es.addPlace.searchLabel}
-        autoCorrect={false}
-      />
-      {!barrios && <Text style={ui.muted}>{es.addPlace.barriosMissing}</Text>}
-      {query.trim() !== "" && barrios && results.length === 0 && (
-        <Text style={ui.muted}>{es.addPlace.noResults}</Text>
+      {!searching && (
+        <Text style={[ui.heading, { marginTop: space.sm }]}>
+          {t.searchLabel}
+        </Text>
       )}
-      <View style={{ gap: 8 }}>
-        {results.map((option) => (
+      <View
+        style={[
+          styles.search,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
+      >
+        <Search size={22} color={colors.muted} />
+        <TextInput
+          style={[ui.body, { flex: 1, paddingVertical: 14 }]}
+          value={query}
+          onChangeText={setQuery}
+          placeholder={t.searchPlaceholder}
+          placeholderTextColor={colors.muted}
+          accessibilityLabel={t.searchLabel}
+          autoCorrect={false}
+        />
+        {searching && (
           <Pressable
-            key={option.id}
             accessibilityRole="button"
-            onPress={() => pick(option.id)}
-            style={({ pressed }) => [ui.card, pressed && { opacity: 0.7 }]}
+            accessibilityLabel={t.clearSearch}
+            hitSlop={12}
+            onPress={() => setQuery("")}
           >
-            <Text style={ui.body}>{option.name}</Text>
+            <CircleX size={22} color={colors.muted} />
           </Pressable>
-        ))}
+        )}
       </View>
+      {!barrios && <Text style={ui.muted}>{t.barriosMissing}</Text>}
+      {searching && barrios && results.length === 0 && (
+        <Text style={ui.muted}>{t.noResults}</Text>
+      )}
+      {results.map((option) => (
+        <OptionRow
+          key={option.id}
+          icon={MapPin}
+          title={option.name}
+          onPress={() => pick(option.id)}
+        />
+      ))}
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  centered: { alignItems: "center", gap: space.md },
+  center: { textAlign: "center" },
+  actions: { alignSelf: "stretch", gap: space.sm, marginTop: space.sm },
+  row: { flexDirection: "row", alignItems: "center", gap: space.md },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
+  chip: {
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    paddingHorizontal: space.md + 2,
+    paddingVertical: 10,
+  },
+  search: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.sm,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    paddingHorizontal: space.md + 2,
+  },
+  floatTop: {
+    position: "absolute",
+    top: space.md,
+    left: space.md,
+    right: space.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.sm,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    padding: space.md,
+  },
+  floatBottom: {
+    position: "absolute",
+    bottom: space.xl,
+    left: space.lg,
+    right: space.lg,
+  },
+});
