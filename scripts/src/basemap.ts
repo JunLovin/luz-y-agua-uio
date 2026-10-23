@@ -6,9 +6,11 @@ export const ATTRIBUTION = "© colaboradores de OpenStreetMap";
 export function buildStyle({
   tilesUrl,
   glyphsBaseUrl,
+  flavor = "light",
 }: {
   tilesUrl: string;
   glyphsBaseUrl: string;
+  flavor?: "light" | "dark";
 }) {
   return {
     version: 8,
@@ -21,7 +23,7 @@ export function buildStyle({
       },
     },
     // Icon layers need a sprite, which we do not publish.
-    layers: layers("protomaps", namedFlavor("light"), { lang: "es" }).filter(
+    layers: layers("protomaps", namedFlavor(flavor), { lang: "es" }).filter(
       (layer) =>
         !("layout" in layer && layer.layout && "icon-image" in layer.layout),
     ),
