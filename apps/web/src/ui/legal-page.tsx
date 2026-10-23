@@ -29,7 +29,7 @@ export function LegalPage({
           {es.legal.version(config.legal.privacyVersion, versionDate)}
         </p>
       )}
-      <p className="tag">{es.legal.draft}</p>
+      <p className="draft">{es.legal.draft}</p>
       <p>{text.intro}</p>
       {text.sections.map((section) => (
         <section key={section.title}>

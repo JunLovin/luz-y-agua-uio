@@ -13,22 +13,28 @@ export const es = {
     nav: { luz: "Luz hoy", agua: "Agua hoy" },
     legal: { privacy: "Privacidad", terms: "Términos", about: "Acerca" },
     sourceCode: "Código en GitHub",
+    theme: "Apariencia",
+    navToday: "Cortes de hoy",
+    navLegal: "Información legal",
+    themes: { dark: "Oscuro", light: "Claro", auto: "Automático" },
     sources:
       "Información de fuentes oficiales públicas y reportes anónimos de vecinos. Puede contener errores: ante una emergencia, llama al 911.",
   },
   services: { luz: "luz", agua: "agua" },
   serviceTitles: { luz: "Luz", agua: "Agua" },
   home: {
-    summary: (luz: number, agua: number) =>
-      `Hoy hay ${plural(luz, "corte de luz", "cortes de luz")} y ${plural(agua, "corte de agua", "cortes de agua")} anunciados en Quito.`,
+    title: "Cortes de luz y agua en Quito, hoy",
+    count: (n: number, service: string) =>
+      n === 1
+        ? `corte de ${service} anunciado hoy`
+        : `cortes de ${service} anunciados hoy`,
+    seeList: "Ver la lista por barrio",
     crowd: (barrios: number) =>
       `Vecinos reportan cortes en ${plural(barrios, "barrio", "barrios")} en este momento.`,
-    seeLuz: "Ver los cortes de luz de hoy",
-    seeAgua: "Ver los cortes de agua de hoy",
     appTitle: "La app",
     appBody:
       "Guarda tu casa o tu trabajo y recibe un aviso cuando se anuncie un corte en tu barrio. Sin cuentas: tu ubicación nunca sale del teléfono.",
-    soon: "Próximamente en Android y iPhone.",
+    soon: "Próximamente en Android y iPhone",
   },
   today: {
     title: (service: string) => `Cortes de ${service} en Quito hoy`,
@@ -49,10 +55,12 @@ export const es = {
     title: (name: string) => `Cortes de luz y agua en ${name}`,
     description: (name: string) =>
       `Cortes de luz y agua anunciados en ${name}, Quito, y lo que reportan sus vecinos.`,
+    now: "Ahora",
+    nowClear: "Sin cortes anunciados",
+    nowOngoing: "Corte en curso",
+    nowCrowd: "Vecinos reportan corte",
     upcoming: "Cortes anunciados",
-    none: "No hay cortes anunciados para este barrio.",
     neighbors: "Reportes de vecinos",
-    neighborsNone: "Nadie reporta cortes en este momento.",
     neighborsCount: (service: string, reports: number) =>
       `Corte de ${service}: ${plural(reports, "vecino lo reporta", "vecinos lo reportan")}.`,
   },

@@ -1,5 +1,6 @@
 import type { Service } from "@luz-y-agua/shared";
 import { cacheLife } from "next/cache";
+import { Droplet, MapPin, Zap } from "lucide-react";
 import Link from "next/link";
 import { todayByBarrio } from "@/domain/today";
 import { es } from "@/i18n/es";
@@ -34,20 +35,30 @@ export async function TodayPage({ service }: { service: Service }) {
     })),
   );
 
+  const Icon = service === "luz" ? Zap : Droplet;
+
   return (
     <>
-      <h1>{es.today.title(label)}</h1>
-      <p>
-        <strong>{es.today.date(formatLongDate(now))}</strong>{" "}
-        <span className="muted">{es.today.updated(formatTime(now))}</span>
-      </p>
+      <header className={`page-head tone-${service}`}>
+        <span className="badge badge-lg">
+          <Icon size={30} aria-hidden="true" />
+        </span>
+        <div>
+          <h1>{es.today.title(label)}</h1>
+          <p className="muted">
+            {es.today.date(formatLongDate(now))} ·{" "}
+            {es.today.updated(formatTime(now))}
+          </p>
+        </div>
+      </header>
       {barrios.length === 0 ? (
-        <p>{es.today.none(label)}</p>
+        <p className="card">{es.today.none(label)}</p>
       ) : (
         <ul className="list">
           {barrios.map((barrio) => (
-            <li key={barrio.barrioId} className="card">
-              <h2>
+            <li key={barrio.barrioId} className={`card tone-${service}`}>
+              <h2 className="row">
+                <MapPin size={22} aria-hidden="true" className="tone-icon" />
                 <Link href={`/barrio/${barrio.barrioId}`}>{barrio.name}</Link>
               </h2>
               {barrio.outages.map((outage) => (
