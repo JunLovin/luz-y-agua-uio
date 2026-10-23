@@ -47,7 +47,6 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ title: es.places.title }} />
         <Stack.Screen name="bienvenida" options={{ headerShown: false }} />
-        <Stack.Screen name="avisos" options={{ headerShown: false }} />
         <Stack.Screen
           name="agregar"
           options={{ title: es.addPlace.title, presentation: "modal" }}

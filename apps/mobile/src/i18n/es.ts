@@ -22,28 +22,31 @@ export const es = {
   },
   welcome: {
     stepLabel: (step: number, total: number) => `Paso ${step} de ${total}`,
+    back: "Volver",
     privacyMissing:
       "La política de privacidad no está disponible en esta versión.",
-    steps: [
-      {
-        title: "Avisos de cortes en tu barrio",
-        body: "Te avisamos de los cortes de luz y agua programados en Quito y de lo que reportan tus vecinos.",
-      },
-      {
-        title: "¿Tienes 15 años o más?",
-        body: "La app es para personas de 15 años o más.",
-        confirm: "Sí, tengo 15 años o más",
-      },
-      {
-        title: "Tu privacidad",
-        body: "No pedimos cuenta, nombre ni teléfono. Tu ubicación y tus lugares se quedan en tu teléfono: al servidor solo llega el código de tu barrio cuando reportas un corte.",
-        link: "Leer la política de privacidad",
-        confirm: "Acepto la política de privacidad",
-      },
-    ],
+    intro: {
+      title: "Que el corte no te tome por sorpresa",
+      body: "Te avisamos de los cortes de luz y agua anunciados en tu barrio de Quito y de lo que reportan tus vecinos.",
+    },
+    age: {
+      title: "¿Tienes 15 años o más?",
+      body: "La app es para personas de 15 años o más.",
+      confirm: "Sí, tengo 15 o más",
+    },
+    privacy: {
+      title: "Tu privacidad va primero",
+      points: [
+        "Tu ubicación nunca sale del teléfono.",
+        "Sin cuenta, sin nombre y sin número de teléfono.",
+        "Los avisos llegan por barrio: nadie sabe quién los recibe.",
+      ],
+      link: "Leer la política de privacidad",
+      confirm: "Acepto la política",
+    },
   },
   notifications: {
-    title: "Activa los avisos",
+    title: "¿Te avisamos?",
     body: "Te avisaremos cuando se publique un corte en tus barrios y un rato antes de que empiece. No necesitamos saber quién eres: los avisos llegan por barrio.",
     allow: "Activar avisos",
     disable: "Desactivar avisos",
