@@ -111,6 +111,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@luz-y-agua/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@supabase/supabase-js':
         specifier: 2.117.2
         version: 2.117.2

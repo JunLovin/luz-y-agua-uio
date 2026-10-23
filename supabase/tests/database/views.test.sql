@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(11);
+select plan(12);
 
 insert into barrios (id, name, geom, source) values
   ('small', 'Small', 'SRID=4326;MULTIPOLYGON(((0 0,0 1,1 1,0 0)))', 'osm'),
@@ -59,6 +59,7 @@ select throws_ok(
 delete from barrios_releases;
 insert into barrios_releases (version, url) values (1, 'v1'), (2, 'v2');
 select is((select url from public_barrios_meta), 'v2', 'barrios meta returns the latest release');
+select is((select name from public_barrios where id = 'big'), 'Big', 'public_barrios lists names without geometry');
 
 insert into daily_salts (day, salt) values
   ((now() - interval '3 days')::date, 'a'), ((now() - interval '1 day')::date, 'b');

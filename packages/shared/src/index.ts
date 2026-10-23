@@ -18,3 +18,10 @@ export {
   type ReportInput,
   type ReportStatus,
 } from "./reports.ts";
+export {
+  statusFor,
+  type BarrioStatus,
+  type CitySnapshot,
+  type CrowdLive,
+  type PublicOutage,
+} from "./city.ts";

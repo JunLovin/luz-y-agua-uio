@@ -1,55 +1,17 @@
-import type { Service } from "@luz-y-agua/shared";
+import {
+  statusFor,
+  type CitySnapshot,
+  type PublicOutage,
+  type Service,
+} from "@luz-y-agua/shared";
 
-export type PublicOutage = {
-  id: string;
-  service: Service;
-  kind: "scheduled" | "unscheduled";
-  zone_id: string | null;
-  barrio_ids: string[];
-  starts_at: string;
-  ends_at: string | null;
-  tier: "high" | "medium";
-  source_label: string;
-  supersedes: string | null;
-  notes: string | null;
-};
-
-export type CrowdLive = {
-  barrio_id: string;
-  service: Service;
-  reports: number;
-};
-
-/** The whole city as downloaded from the public views. Filtering happens only on the phone. */
-export type CitySnapshot = {
-  outages: PublicOutage[];
-  crowd: CrowdLive[];
-  fetchedAt: string;
-};
-
-export type BarrioStatus = {
-  outages: PublicOutage[];
-  crowd: CrowdLive[];
-};
-
-/** Outages and neighbor reports for one barrio, upcoming first, ended ones dropped. */
-export function statusFor(
-  snapshot: CitySnapshot,
-  barrioId: string,
-  now: Date,
-): BarrioStatus {
-  const outages = snapshot.outages
-    .filter(
-      (o) =>
-        o.barrio_ids.includes(barrioId) &&
-        (o.ends_at === null || new Date(o.ends_at) > now),
-    )
-    .sort((a, b) => a.starts_at.localeCompare(b.starts_at));
-  return {
-    outages,
-    crowd: snapshot.crowd.filter((c) => c.barrio_id === barrioId),
-  };
-}
+export {
+  statusFor,
+  type BarrioStatus,
+  type CitySnapshot,
+  type CrowdLive,
+  type PublicOutage,
+} from "@luz-y-agua/shared";
 
 export type PlaceAlert =
   | { kind: "crowd"; service: Service; reports: number }
