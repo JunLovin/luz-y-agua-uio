@@ -29,7 +29,7 @@ export function Button({
       border: colors.primary,
     },
     secondary: { bg: colors.raised, fg: colors.text, border: colors.border },
-    ghost: { bg: "transparent", fg: colors.primary, border: "transparent" },
+    ghost: { bg: "transparent", fg: colors.luz.text, border: "transparent" },
     danger: {
       bg: colors.danger.soft,
       fg: colors.danger.text,

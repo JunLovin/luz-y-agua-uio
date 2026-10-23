@@ -40,7 +40,7 @@ export default function RootLayout() {
           headerTransparent: false,
           headerStyle: { backgroundColor: colors.background },
           headerShadowVisible: false,
-          headerTintColor: colors.primary,
+          headerTintColor: colors.luz.text,
           headerTitleStyle: { color: colors.text, fontFamily: fonts.bold },
           headerBackButtonDisplayMode: "minimal",
           contentStyle: { backgroundColor: colors.background },

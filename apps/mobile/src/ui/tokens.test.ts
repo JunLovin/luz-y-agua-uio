@@ -15,6 +15,11 @@ describe.each([
     }
   });
 
+  it("keeps ghost buttons and the header back link readable on every surface", () => {
+    for (const bg of [p.background, p.surface, p.raised])
+      expect(contrast(p.luz.text, bg)).toBeGreaterThanOrEqual(AA_TEXT);
+  });
+
   it("keeps labels readable on the primary and service fills", () => {
     for (const fill of [p.primary, p.luz.solid, p.agua.solid])
       expect(contrast(p.onPrimary, fill)).toBeGreaterThanOrEqual(AA_TEXT);
