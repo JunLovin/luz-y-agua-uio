@@ -52,7 +52,7 @@ export function NightCity({ progress }: { progress: number }) {
       windows.forEach(({ light }, rank) => light.setValue(rank < lit ? 1 : 0));
       return;
     }
-    Animated.stagger(
+    const animation = Animated.stagger(
       18,
       windows.map(({ light }, rank) =>
         Animated.timing(light, {
@@ -61,7 +61,9 @@ export function NightCity({ progress }: { progress: number }) {
           useNativeDriver: false,
         }),
       ),
-    ).start();
+    );
+    animation.start();
+    return () => animation.stop();
   }, [progress, reduceMotion, windows]);
 
   return (

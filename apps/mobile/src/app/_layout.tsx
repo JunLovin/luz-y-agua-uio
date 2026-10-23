@@ -18,7 +18,7 @@ import { useTopicSync } from "../ui/use-topic-sync";
 export default function RootLayout() {
   const { colors, scheme } = useTheme();
   // Bundled with the app: the font never comes from the internet.
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     AtkinsonHyperlegibleNext_400Regular,
     AtkinsonHyperlegibleNext_500Medium,
     AtkinsonHyperlegibleNext_700Bold,
@@ -29,7 +29,8 @@ export default function RootLayout() {
     void SystemUI.setBackgroundColorAsync(colors.background);
   }, [colors.background]);
 
-  if (!fontsLoaded)
+  // If the font fails to load, carry on with the system font rather than a blank screen.
+  if (!fontsLoaded && !fontError)
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
 
   return (
