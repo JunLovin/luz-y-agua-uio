@@ -1,28 +1,26 @@
-import { es } from "./es";
+import { outageWindow } from "@luz-y-agua/shared";
 
 const QUITO = "America/Guayaquil";
 
-const day = new Intl.DateTimeFormat("es-EC", {
-  timeZone: QUITO,
-  weekday: "short",
-  day: "numeric",
-  month: "short",
-});
-const time = new Intl.DateTimeFormat("es-EC", {
-  timeZone: QUITO,
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-});
-
-/** "mar, 21 oct · 09:00–13:00" in Quito time; "desde las 09:00" when the end is unknown. */
+/** "Hoy de 09:00 a 13:00", "Mañana desde las 09:00", "El mar, 21 oct de…": same words as the pushes. */
 export function formatOutageWindow(
   startsAt: string,
   endsAt: string | null,
+  now: Date = new Date(),
 ): string {
-  const start = new Date(startsAt);
-  const from = `${day.format(start)} · ${time.format(start)}`;
-  return endsAt
-    ? `${from}–${time.format(new Date(endsAt))}`
-    : `${from} ${es.format.openEnded}`;
+  const text = outageWindow(startsAt, endsAt, now);
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+const longDay = new Intl.DateTimeFormat("es-EC", {
+  timeZone: QUITO,
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+
+/** "Jueves, 23 de octubre", in Quito time. */
+export function formatToday(now: Date): string {
+  const text = longDay.format(now);
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
