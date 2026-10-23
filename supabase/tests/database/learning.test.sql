@@ -1,11 +1,12 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(13);
+select plan(14);
 
 insert into barrios (id, name, geom, source) values
   ('a', 'A', 'SRID=4326;MULTIPOLYGON(((0 0,0 1,1 1,0 0)))', 'osm'),
   ('b', 'B', 'SRID=4326;MULTIPOLYGON(((0 0,0 1,1 1,0 0)))', 'osm'),
-  ('c', 'C', 'SRID=4326;MULTIPOLYGON(((0 0,0 1,1 1,0 0)))', 'osm');
+  ('c', 'C', 'SRID=4326;MULTIPOLYGON(((0 0,0 1,1 1,0 0)))', 'osm'),
+  ('d', 'D', 'SRID=4326;MULTIPOLYGON(((0 0,0 1,1 1,0 0)))', 'osm');
 insert into utility_zones (id, utility, service, name) values ('eeq_z', 'eeq', 'luz', 'Z');
 insert into zone_barrio (zone_id, barrio_id, weight, origin) values ('eeq_z', 'a', 1, 'official');
 insert into source_documents (id, source_id, sha256, status) values
@@ -40,6 +41,12 @@ select is(pg_temp.trust(), 0.50::real, 'silence in a barrio with report history 
 select pg_temp.outage('3', '{c}', interval '2 hours');
 select evaluate_outages();
 select is(pg_temp.trust(), 0.50::real, 'silence in a barrio with no history changes nothing');
+-- One phone reporting on five days has five hashes, but it is still one person.
+insert into reports (barrio_id, service, status, dedup_hash, salt_day, received_at)
+select 'd', 'luz', 'out', 'daily' || g, current_date - g, now() - make_interval(days => g) from generate_series(1, 5) g;
+select pg_temp.outage('12', '{d}', interval '2 hours');
+select evaluate_outages();
+select is(pg_temp.trust(), 0.50::real, 'one person reporting on many days is not a report history');
 
 -- Outages that are not evaluated.
 select pg_temp.outage('4', '{a}', interval '5 minutes');
