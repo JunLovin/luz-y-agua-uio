@@ -54,6 +54,7 @@ export const es = {
     label: "Mapa de Quito con los barrios afectados",
     service: "Servicio",
     legendLabel: "Leyenda",
+    affected: "Barrios afectados",
     legend: {
       high: "Corte anunciado",
       medium: "Sin confirmar",

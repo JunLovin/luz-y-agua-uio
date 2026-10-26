@@ -38,15 +38,10 @@ export default async function Home() {
         {services.map(({ service, icon: Icon, href }) => {
           const count = outagesToday(city, service, now).length;
           return (
-            <Link
-              key={service}
-              href={href}
-              className={`tile tone-${service}`}
-              aria-label={`${count} ${t.count(count, es.services[service])}. ${t.seeList}`}
-            >
+            <Link key={service} href={href} className={`tile tone-${service}`}>
               <Icon size={28} aria-hidden="true" />
-              <span className="big">{count}</span>
-              <span>{t.count(count, es.services[service])}</span>
+              <span className="big">{count}</span>{" "}
+              <span>{t.count(count, es.services[service])}.</span>{" "}
               <span className="muted" style={{ color: "inherit" }}>
                 {t.seeList}
               </span>

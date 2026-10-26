@@ -44,6 +44,7 @@ export function LiveMap({ city, sources, variant }: Props) {
   const [service, setService] = useState<Service>("luz");
   const [example, setExample] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [drawn, setDrawn] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -87,8 +88,10 @@ export function LiveMap({ city, sources, variant }: Props) {
     () => loaded && mapBarrios(loaded.geojson, snapshot, service, loaded.now),
     [loaded, snapshot, service],
   );
-  const affected =
-    barrios?.features.filter((f) => f.properties.status !== "none").length ?? 0;
+  const affected = (barrios?.features ?? [])
+    .map((f) => f.properties)
+    .filter((b) => b.status !== "none")
+    .sort((a, b) => a.name.localeCompare(b.name, "es"));
   const selectedName = barrios?.features.find(
     (f) => f.properties.id === selected,
   )?.properties.name;
@@ -101,7 +104,12 @@ export function LiveMap({ city, sources, variant }: Props) {
   return (
     <div className={`live-map live-map-${variant}`}>
       <div className="map-frame" ref={frame}>
-        {visible && barrios && !failed ? (
+        {(failed || !drawn) && (
+          <p className="map-status muted" role="status">
+            {failed ? t.unavailable : t.loading}
+          </p>
+        )}
+        {visible && barrios && !failed && (
           <MapCanvas
             styleUrl={sources.styles[scheme]}
             barrios={barrios}
@@ -109,12 +117,9 @@ export function LiveMap({ city, sources, variant }: Props) {
             selected={selected}
             cooperative={variant === "hero"}
             onSelect={setSelected}
+            onDrawn={() => setDrawn(true)}
             onError={() => setFailed(true)}
           />
-        ) : (
-          <p className="map-status muted" role="status">
-            {failed ? t.unavailable : t.loading}
-          </p>
         )}
 
         <div className="map-top">
@@ -163,7 +168,14 @@ export function LiveMap({ city, sources, variant }: Props) {
             service={service}
             now={now}
             example={example}
-            onClose={() => setSelected(null)}
+            onClose={() => {
+              setSelected(null);
+              frame.current?.parentElement
+                ?.querySelector<HTMLButtonElement>(
+                  `[data-barrio="${selected}"]`,
+                )
+                ?.focus();
+            }}
           />
         )}
       </div>
@@ -182,7 +194,7 @@ export function LiveMap({ city, sources, variant }: Props) {
         </ul>
         {barrios && (
           <p className="muted" aria-live="polite">
-            {t.summary(affected, es.services[service])}{" "}
+            {t.summary(affected.length, es.services[service])}{" "}
             {example ? (
               <button
                 type="button"
@@ -197,6 +209,24 @@ export function LiveMap({ city, sources, variant }: Props) {
               </Link>
             )}
           </p>
+        )}
+        {affected.length > 0 && (
+          <ul className="affected" aria-label={t.affected}>
+            {affected.map((barrio) => (
+              <li key={barrio.id}>
+                <button
+                  type="button"
+                  className={`chip tone-${barrio.status === "crowd" ? "crowd" : service}`}
+                  data-status={barrio.status}
+                  data-barrio={barrio.id}
+                  aria-pressed={selected === barrio.id}
+                  onClick={() => setSelected(barrio.id)}
+                >
+                  {barrio.name}
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </div>
@@ -225,8 +255,16 @@ function BarrioCard({
   const outages = status.outages.filter((o) => o.service === service);
   const crowd = status.crowd.find((c) => c.service === service);
   const Icon = ICONS[service];
+  const card = useRef<HTMLElement>(null);
+  useEffect(() => card.current?.focus(), [id]);
   return (
-    <section className={`map-card tone-${service}`} aria-label={name}>
+    <section
+      ref={card}
+      tabIndex={-1}
+      className={`map-card tone-${service}`}
+      aria-label={name}
+      onKeyDown={(event) => event.key === "Escape" && onClose()}
+    >
       <div className="map-card-head">
         <h3>
           <Icon size={20} aria-hidden="true" />

@@ -447,6 +447,7 @@ a.tile:hover {
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
   opacity: 0;
 }
 
@@ -700,6 +701,45 @@ a.tile:hover {
 
 .swatch-medium {
   opacity: 0.45;
+}
+
+.affected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  min-height: 44px;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--tone);
+  border-radius: 999px;
+  background: var(--tone-soft);
+  color: var(--tone-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chip[data-status="medium"] {
+  border-style: dashed;
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--tone);
+  color: var(--on-primary);
+}
+
+.map-card:focus {
+  outline: none;
+}
+
+.map-card:focus-visible {
+  outline: 3px solid var(--text);
 }
 
 .maplibregl-ctrl-attrib,

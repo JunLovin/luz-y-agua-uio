@@ -18,12 +18,15 @@ type Props = {
   selected: string | null;
   cooperative: boolean;
   onSelect: (id: string | null) => void;
+  onDrawn: () => void;
   onError: () => void;
 };
 
 const QUITO: [number, number] = [-78.5, -0.2];
 const SOURCE = "barrios";
 const GLOW = "barrios-glow";
+const BREATHS = 3;
+const BREATH_MS = 2_400;
 
 let protocolReady = false;
 
@@ -101,13 +104,28 @@ export default function MapCanvas({
   selected,
   cooperative,
   onSelect,
+  onDrawn,
   onError,
 }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const latest = useRef({ barrios, service, selected, onSelect, onError });
+  const latest = useRef({
+    barrios,
+    service,
+    selected,
+    onSelect,
+    onDrawn,
+    onError,
+  });
   useEffect(() => {
-    latest.current = { barrios, service, selected, onSelect, onError };
+    latest.current = {
+      barrios,
+      service,
+      selected,
+      onSelect,
+      onDrawn,
+      onError,
+    };
   });
 
   useEffect(() => {
@@ -146,6 +164,10 @@ export default function MapCanvas({
       const { barrios, service, selected } = latest.current;
       addBarrios(map, barrios, service, selected);
     });
+    map.once("load", () => {
+      latest.current.onDrawn();
+      breathe();
+    });
     map.on("error", (event) => {
       if (!map.isStyleLoaded()) latest.current.onError();
       console.warn("map:", event.error?.message);
@@ -163,19 +185,25 @@ export default function MapCanvas({
       map.getCanvas().style.cursor = "";
     });
 
-    // The one animated moment: affected barrios breathe, unless the visitor asked for less motion.
+    // The one animated moment: affected barrios breathe a few times once the map is up, then
+    // hold still, since every animated frame repaints the whole map. Skipped for reduced motion.
     let frame = 0;
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const breathe = (time: number) => {
-      if (map.getLayer(GLOW) && !still.matches)
-        map.setPaintProperty(
-          GLOW,
-          "line-opacity",
-          0.55 + 0.4 * Math.sin(time / 600),
-        );
-      frame = requestAnimationFrame(breathe);
+    const breathe = () => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const start = performance.now();
+      const step = (time: number) => {
+        const t = time - start;
+        const done = t > BREATHS * BREATH_MS;
+        if (map.getLayer(GLOW))
+          map.setPaintProperty(
+            GLOW,
+            "line-opacity",
+            done ? 0.9 : 0.55 + 0.35 * Math.cos((2 * Math.PI * t) / BREATH_MS),
+          );
+        if (!done) frame = requestAnimationFrame(step);
+      };
+      frame = requestAnimationFrame(step);
     };
-    frame = requestAnimationFrame(breathe);
 
     mapRef.current = map;
     return () => {
