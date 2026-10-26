@@ -6,8 +6,12 @@ function env(name: string): string {
   return value;
 }
 
+export function supabaseUrl(): string {
+  return env("SUPABASE_URL");
+}
+
 export function anonClient() {
-  return createClient(env("SUPABASE_URL"), env("SUPABASE_ANON_KEY"), {
+  return createClient(supabaseUrl(), env("SUPABASE_ANON_KEY"), {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
@@ -17,7 +21,7 @@ export function callFunction(
   token: string,
   init: { body: BodyInit; headers?: Record<string, string> },
 ) {
-  return fetch(`${env("SUPABASE_URL")}/functions/v1/${name}`, {
+  return fetch(`${supabaseUrl()}/functions/v1/${name}`, {
     method: "POST",
     body: init.body,
     headers: {

@@ -4,7 +4,7 @@ import {
   type PublicOutage,
 } from "@luz-y-agua/shared";
 import { cacheLife } from "next/cache";
-import { anonClient } from "./supabase";
+import { anonClient, supabaseUrl } from "./supabase";
 
 /** The whole city from the public views, cached so visits never reach the database. */
 export async function getCity(): Promise<CitySnapshot> {
@@ -34,4 +34,25 @@ export async function getBarrioNames(): Promise<Record<string, string>> {
     .select("id, name");
   if (error) throw new Error(`public_barrios: ${error.message}`);
   return Object.fromEntries(data.map((b) => [b.id, b.name]));
+}
+
+export type MapSources = {
+  barriosUrl: string | null;
+  styles: { dark: string; light: string };
+};
+
+/** Where the browser loads the map from: only our own storage (CLAUDE.md rule 11). */
+export async function getMapSources(): Promise<MapSources> {
+  "use cache";
+  cacheLife("hours");
+  const { data, error } = await anonClient()
+    .from("public_barrios_meta")
+    .select("url")
+    .maybeSingle();
+  if (error) throw new Error(`public_barrios_meta: ${error.message}`);
+  const tiles = `${supabaseUrl()}/storage/v1/object/public/tiles`;
+  return {
+    barriosUrl: data?.url ?? null,
+    styles: { dark: `${tiles}/style-dark.json`, light: `${tiles}/style.json` },
+  };
 }
