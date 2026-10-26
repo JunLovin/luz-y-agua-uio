@@ -423,6 +423,227 @@ a.tile:hover {
   color: var(--on-primary);
 }
 
+/* Live map */
+
+.live-map {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.map-frame {
+  position: relative;
+  overflow: hidden;
+  height: 420px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.live-map-page .map-frame {
+  height: min(70dvh, 720px);
+  min-height: 420px;
+}
+
+/* Beats maplibre-gl.css, which makes every map container position: relative. */
+.map-frame > .map-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.map-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.map-top {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  right: 3.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  pointer-events: none;
+}
+
+.map-top > * {
+  pointer-events: auto;
+}
+
+.segmented {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.segmented button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.3rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.segmented button svg {
+  color: var(--tone);
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--tone);
+  color: var(--on-primary);
+}
+
+.segmented button[aria-pressed="true"] svg {
+  color: inherit;
+}
+
+.example-badge {
+  border: 1px solid var(--tone);
+}
+
+.map-empty,
+.map-card {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  display: grid;
+  gap: 0.6rem;
+  max-width: 24rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.35);
+}
+
+.map-card {
+  border-top: 4px solid var(--tone);
+}
+
+.map-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.map-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.15rem;
+}
+
+.map-card h3 svg {
+  color: var(--tone);
+}
+
+.button,
+.icon-button,
+.link-button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.button {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0.5rem 1.2rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--raised);
+  color: var(--text);
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.map-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.swatch {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 5px;
+  background: var(--tone);
+}
+
+.swatch-medium {
+  opacity: 0.45;
+}
+
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-group {
+  font-family: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .map-card,
+  .map-empty {
+    animation: rise 180ms ease-out;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 /* Legal */
 
 .legal {

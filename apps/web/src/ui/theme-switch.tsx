@@ -29,6 +29,33 @@ function choose(next: Theme) {
   for (const listener of listeners) listener();
 }
 
+const lightQuery = () => window.matchMedia("(prefers-color-scheme: light)");
+
+function readScheme(): "dark" | "light" {
+  const theme = read();
+  if (theme !== "auto") return theme;
+  return lightQuery().matches ? "light" : "dark";
+}
+
+function subscribeScheme(listener: () => void) {
+  const query = lightQuery();
+  query.addEventListener("change", listener);
+  const off = subscribe(listener);
+  return () => {
+    off();
+    query.removeEventListener("change", listener);
+  };
+}
+
+/** The scheme on screen right now, following "Automático" to the system. */
+export function useScheme() {
+  return useSyncExternalStore(
+    subscribeScheme,
+    readScheme,
+    () => "dark" as const,
+  );
+}
+
 /** Dark by default, like the app. The choice stays in this browser only (localStorage, no cookie). */
 export function ThemeSwitch() {
   const theme = useSyncExternalStore(subscribe, read, () => "dark" as const);

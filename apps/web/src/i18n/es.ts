@@ -10,7 +10,7 @@ export const es = {
   independence: "App independiente, no afiliada a la EEQ ni a Epmaps.",
   layout: {
     skip: "Saltar al contenido",
-    nav: { luz: "Luz hoy", agua: "Agua hoy" },
+    nav: { luz: "Luz hoy", agua: "Agua hoy", map: "Mapa" },
     legal: { privacy: "Privacidad", terms: "Términos", about: "Acerca" },
     sourceCode: "Código en GitHub",
     theme: "Apariencia",
@@ -35,6 +35,42 @@ export const es = {
     appBody:
       "Guarda tu casa o tu trabajo y recibe un aviso cuando se anuncie un corte en tu barrio. Sin cuentas: tu ubicación nunca sale del teléfono.",
     soon: "Próximamente en Android y iPhone",
+  },
+  map: {
+    title: "Mapa de cortes en Quito",
+    description:
+      "Mapa en vivo de los barrios de Quito con cortes de luz y agua anunciados y los que reportan los vecinos.",
+    label: "Mapa de Quito con los barrios afectados",
+    service: "Servicio",
+    legendLabel: "Leyenda",
+    legend: {
+      high: "Corte anunciado",
+      medium: "Sin confirmar",
+      crowd: "Vecinos reportan",
+    },
+    summary: (n: number, service: string) =>
+      n === 0
+        ? `Ningún barrio con corte de ${service} ahora ni más tarde hoy.`
+        : `${plural(n, "barrio", "barrios")} con corte de ${service} hoy.`,
+    empty: "Hoy no hay cortes anunciados ni reportes de vecinos en Quito.",
+    showExample: "Ver un ejemplo",
+    example: "Ejemplo: estos no son cortes reales.",
+    backToToday: "Volver a los cortes de hoy",
+    exampleSource: "Ejemplo",
+    loading: "Cargando el mapa…",
+    unavailable:
+      "No se pudo cargar el mapa. Revisa tu conexión y recarga la página.",
+    openBarrio: "Ver el barrio",
+    close: "Cerrar",
+    clear: (service: string) => `Sin cortes de ${service} hoy.`,
+    crowd: (reports: number) =>
+      `${plural(reports, "vecino reporta", "vecinos reportan")} corte ahora.`,
+    attribution: "© colaboradores de OpenStreetMap",
+    gestures: {
+      windows: "Usa Ctrl + rueda del mouse para acercar el mapa",
+      mac: "Usa ⌘ + rueda del mouse para acercar el mapa",
+      mobile: "Usa dos dedos para mover el mapa",
+    },
   },
   today: {
     title: (service: string) => `Cortes de ${service} en Quito hoy`,

@@ -29,3 +29,6 @@ expo-env.d.ts
 *.mobileprovision
 google-services.json
 GoogleService-Info.plist
+
+# Copied from maplibre-gl at build time (pnpm --filter web map-worker)
+apps/web/public/maplibre-gl-worker.mjs
