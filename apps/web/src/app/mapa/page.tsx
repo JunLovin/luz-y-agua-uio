@@ -22,7 +22,7 @@ export default async function MapPage() {
       intro={
         <>
           <h1>{es.map.title}</h1>
-          <p className="lead">{es.home.lead}</p>
+          <p className="lead">{es.home.tapHint}</p>
         </>
       }
     />

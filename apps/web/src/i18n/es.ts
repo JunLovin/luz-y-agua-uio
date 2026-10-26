@@ -23,33 +23,46 @@ export const es = {
   services: { luz: "luz", agua: "agua" },
   serviceTitles: { luz: "Luz", agua: "Agua" },
   home: {
-    title: "Cortes de luz y agua en Quito, hoy",
-    lead: "Toca un barrio en el mapa para ver su horario y de dónde viene el aviso.",
+    // The headline reads as one sentence; each part is its own line on screen.
+    headline: {
+      luzBefore: "¿Se va ",
+      luz: "la luz",
+      aguaBefore: "¿Se va ",
+      agua: "el agua",
+      after: "Entérate antes.",
+    },
+    live: (time: string) => `En vivo · actualizado a las ${time}`,
+    lead: "Los cortes anunciados en Quito y lo que reportan tus vecinos, barrio por barrio, en un solo mapa.",
+    tapHint:
+      "Toca un barrio en el mapa para ver su horario y de dónde viene el aviso.",
     count: (n: number, service: string) =>
-      n === 1
-        ? `corte de ${service} anunciado hoy`
-        : `cortes de ${service} anunciados hoy`,
+      n === 1 ? `corte de ${service} hoy` : `cortes de ${service} hoy`,
+    countNone: (service: string) => `Sin cortes de ${service} hoy`,
+    trust: ["Gratis", "Sin cuentas", "Tu ubicación no sale del teléfono"],
+    statement: "barrios en el mapa.",
+    statementAfter: "Tú solo necesitas saber del tuyo.",
+    seeMap: "Abrir el mapa completo",
     seeList: "Ver la lista por barrio",
     crowd: (barrios: number) =>
       `Vecinos reportan cortes en ${plural(barrios, "barrio", "barrios")} en este momento.`,
-    howTitle: "Cómo funciona",
+    howTitle: "Así sabemos lo que pasa en tu barrio",
     how: {
       official: {
-        title: "Cortes anunciados",
-        body: "Leemos los cronogramas públicos de la EEQ y de Epmaps y marcamos cada barrio afectado, con su horario y de dónde sale el aviso.",
+        title: "Lo que anuncian la EEQ y Epmaps",
+        body: "Leemos sus cronogramas públicos y ubicamos cada corte en su barrio, con el horario y la fuente.",
       },
       neighbors: {
         title: "Lo que viven tus vecinos",
-        body: "Si varios vecinos reportan que se fue la luz o el agua, su barrio se pinta de morado aunque nadie lo haya anunciado.",
+        body: "Cuando varios vecinos reportan que se fue la luz o el agua, su barrio se pinta de morado, aunque nadie lo haya anunciado.",
       },
       privacy: {
-        title: "Privado de verdad",
-        body: "Sin cuentas ni rastreadores. La app calcula tu barrio en el teléfono y tu ubicación nunca sale de ahí.",
+        title: "Lo que no sabemos de ti",
+        body: "Ni tu nombre, ni tu número, ni dónde estás. La app calcula tu barrio en el teléfono y ahí se queda.",
       },
     },
-    appTitle: "La app",
+    appTitle: "Guarda tu casa. Te avisamos antes del corte.",
     appBody:
-      "Guarda tu casa o tu trabajo y recibe un aviso cuando se anuncie un corte en tu barrio. Sin cuentas: tu ubicación nunca sale del teléfono.",
+      "Agrega tu casa, tu trabajo o la casa de tus papás. Recibe un aviso cuando anuncien un corte en ese barrio, y otro un rato antes de que empiece.",
     soon: "Próximamente en Android y iPhone",
   },
   preview: {
