@@ -177,6 +177,7 @@ p {
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--border);
 }
 
 .nav {
