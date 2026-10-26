@@ -20,7 +20,7 @@ export type CrowdLive = {
   reports: number;
 };
 
-/** The whole city as read from the public views. Phones filter it locally (CLAUDE.md rule 12). */
+/** The whole city as read from the public views. Phones filter it locally (PRINCIPIOS.md rule 12). */
 export type CitySnapshot = {
   outages: PublicOutage[];
   crowd: CrowdLive[];

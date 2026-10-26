@@ -15,7 +15,7 @@ const BARRIO_ID = /^[a-z0-9_]{1,80}$/;
 const NONCE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
-/** Validates a submit-report body. Unknown fields (like `attestation`, H7) are ignored. */
+/** Validates a submit-report body. Unknown fields (like `attestation`) are ignored. */
 export function parseReport(body: unknown): ReportInput | null {
   if (typeof body !== "object" || body === null) return null;
   const { barrioId, service, status, nonce } = body as Record<string, unknown>;

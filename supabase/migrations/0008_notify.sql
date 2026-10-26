@@ -10,7 +10,7 @@ where utility = 'eeq' and service = 'luz';
 
 grant select on public_eeq_zones to anon, authenticated;
 
--- Needs the Vault secrets `project_url` and `service_role_key` (see CLAUDE.md).
+-- Needs the Vault secrets `project_url` and `service_role_key` (see docs/SPEC.md).
 select cron.schedule('notify', '* * * * *', $$
   select net.http_post(
     url := (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/notify',

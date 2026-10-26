@@ -1,4 +1,4 @@
-/** Placeholder until the project has its own address (see PLAN, H7). */
+/** Where people write about privacy, their data or security. */
 const contact = "CORREO_DEL_PROYECTO";
 
 const plural = (n: number, one: string, many: string) =>

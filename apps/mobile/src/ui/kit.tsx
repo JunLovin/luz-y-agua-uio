@@ -42,7 +42,6 @@ export function Pill({
   );
 }
 
-/** A rounded square with an icon, used to anchor list items and headers. */
 export function IconBadge({
   icon: Icon,
   tone = "neutral",
@@ -72,7 +71,6 @@ export function IconBadge({
   );
 }
 
-/** A tappable card row: icon, title, optional subtitle and a chevron. */
 export function OptionRow({
   icon,
   tone = "neutral",
@@ -112,7 +110,6 @@ export function OptionRow({
   );
 }
 
-/** One choice among a few, as large pill tabs. */
 export function Segmented<T extends string>({
   options,
   value,

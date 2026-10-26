@@ -64,7 +64,7 @@ as $$
 $$;
 revoke execute on function mark_failures_alerted(uuid[]) from public, anon, authenticated;
 
--- 08:00 in Quito. Needs the Vault secrets `project_url` and `service_role_key` (see CLAUDE.md).
+-- 08:00 in Quito. Needs the Vault secrets `project_url` and `service_role_key` (see docs/SPEC.md).
 select cron.schedule('send-alerts', '0 13 * * *', $$
   select net.http_post(
     url := (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/send-alerts',

@@ -22,7 +22,7 @@ as $$
           version = excluded.version
     returning 1
   ),
-  -- ponytail: fails loudly if a dropped barrio still has reports; handle when switching to the Geoportal layer.
+  -- Fails loudly if a dropped barrio still has reports; handle when switching to the Geoportal layer.
   dropped as (
     delete from public.barrios where version < new_version and id not in (
       select f -> 'properties' ->> 'id' from jsonb_array_elements(features) f

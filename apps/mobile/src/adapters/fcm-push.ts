@@ -21,7 +21,7 @@ const allowed = (status: number) =>
   status === AuthorizationStatus.AUTHORIZED ||
   status === AuthorizationStatus.PROVISIONAL;
 
-/** FCM by topic only: the app never sends its push token anywhere (CLAUDE.md rule 3). */
+/** FCM by topic only: the app never sends its push token anywhere (PRINCIPIOS.md rule 3). */
 export const fcmPush: TopicPort & {
   hasPermission(): Promise<boolean>;
   /** "blocked" means the phone will not ask again: only its settings can turn avisos on. */

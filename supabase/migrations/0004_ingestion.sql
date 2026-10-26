@@ -1,4 +1,4 @@
--- CLAUDE.md rule 6: eeq.com.ec is never fetched automatically.
+-- PRINCIPIOS.md rule 6: eeq.com.ec is never fetched automatically.
 alter table sources add constraint sources_eeq_never_automated
   check (not (automated_allowed and coalesce(base_url, '') ilike '%eeq.com.ec%'));
 

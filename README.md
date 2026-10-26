@@ -21,7 +21,7 @@ En desarrollo. La app todavía no está en Google Play ni en la App Store; la we
 - Los avisos llegan por temas de barrio; no sabemos quién recibe cada aviso.
 - Sin analítica, publicidad ni rastreadores.
 
-El diseño técnico completo está en [`docs/SPEC.md`](docs/SPEC.md).
+Estas garantías son reglas del código: están en [`docs/PRINCIPIOS.md`](docs/PRINCIPIOS.md). El diseño técnico completo está en [`docs/SPEC.md`](docs/SPEC.md).
 
 ## Estructura
 

@@ -10,7 +10,7 @@ function fold(text: string): string {
     .trim();
 }
 
-/** Local search by name (no geocoder, CLAUDE.md rule 11): names that start with the query first. */
+/** Local search by name (no geocoder, PRINCIPIOS.md rule 11): names that start with the query first. */
 export function searchByName(
   options: BarrioOption[],
   query: string,

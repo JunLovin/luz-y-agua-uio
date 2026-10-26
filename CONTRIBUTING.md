@@ -36,7 +36,7 @@ pnpm build
 
 ## Reglas del proyecto
 
-Lee las reglas no negociables de privacidad y legales en [`CLAUDE.md`](CLAUDE.md) y la especificación en [`docs/SPEC.md`](docs/SPEC.md). En resumen:
+Lee las reglas no negociables de privacidad y legales en [`docs/PRINCIPIOS.md`](docs/PRINCIPIOS.md) y la especificación en [`docs/SPEC.md`](docs/SPEC.md). En resumen:
 
 - La ubicación nunca sale del teléfono y el servidor no guarda identificadores de personas ni de dispositivos.
 - Nada de analítica, publicidad ni SDKs de terceros que rastreen.

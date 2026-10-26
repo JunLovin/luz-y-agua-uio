@@ -41,7 +41,7 @@ export type MapSources = {
   styles: { dark: string; light: string };
 };
 
-/** Where the browser loads the map from: only our own storage (CLAUDE.md rule 11). */
+/** Where the browser loads the map from: only our own storage (PRINCIPIOS.md rule 11). */
 export async function getMapSources(): Promise<MapSources> {
   "use cache";
   cacheLife("hours");
