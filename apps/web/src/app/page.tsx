@@ -4,8 +4,9 @@ import Link from "next/link";
 import { outagesToday } from "@/domain/today";
 import { es } from "@/i18n/es";
 import { formatLongDate } from "@/i18n/format";
-import { getCity } from "@/server/city";
-import { NightCity } from "@/ui/night-city";
+import { getCity, getMapSources } from "@/server/city";
+import { AppPreview } from "@/ui/app-preview";
+import { LiveMap } from "@/ui/live-map/live-map";
 
 const capitalize = (text: string) =>
   text.charAt(0).toUpperCase() + text.slice(1);
@@ -13,7 +14,7 @@ const capitalize = (text: string) =>
 export default async function Home() {
   "use cache";
   cacheLife("city");
-  const city = await getCity();
+  const [city, sources] = await Promise.all([getCity(), getMapSources()]);
   const now = new Date();
   const crowdBarrios = new Set(city.crowd.map((c) => c.barrio_id)).size;
   const t = es.home;
@@ -28,8 +29,9 @@ export default async function Home() {
         <div className="hero-text">
           <p className="muted">{capitalize(formatLongDate(now))}</p>
           <h1 id="titulo">{t.title}</h1>
+          <p className="lead">{t.lead}</p>
         </div>
-        <NightCity />
+        <LiveMap city={city} sources={sources} variant="hero" />
       </section>
 
       <section className="tiles" aria-label={t.title}>
@@ -60,10 +62,13 @@ export default async function Home() {
         </p>
       )}
 
-      <section className="card" aria-labelledby="app">
-        <h2 id="app">{t.appTitle}</h2>
-        <p>{t.appBody}</p>
-        <p className="pill tone-luz">{t.soon}</p>
+      <section className="card app-section" aria-labelledby="app">
+        <div className="app-text">
+          <h2 id="app">{t.appTitle}</h2>
+          <p>{t.appBody}</p>
+          <p className="pill tone-luz">{t.soon}</p>
+        </div>
+        <AppPreview />
       </section>
     </>
   );

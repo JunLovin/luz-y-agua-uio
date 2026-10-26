@@ -24,6 +24,7 @@ export const es = {
   serviceTitles: { luz: "Luz", agua: "Agua" },
   home: {
     title: "Cortes de luz y agua en Quito, hoy",
+    lead: "Toca un barrio en el mapa para ver su horario y de dónde viene el aviso.",
     count: (n: number, service: string) =>
       n === 1
         ? `corte de ${service} anunciado hoy`
@@ -35,6 +36,16 @@ export const es = {
     appBody:
       "Guarda tu casa o tu trabajo y recibe un aviso cuando se anuncie un corte en tu barrio. Sin cuentas: tu ubicación nunca sale del teléfono.",
     soon: "Próximamente en Android y iPhone",
+  },
+  preview: {
+    label: "Pantallas de la app",
+    pause: "Pausar las pantallas",
+    play: "Reanudar las pantallas",
+    shots: {
+      home: "Mis lugares: tus barrios guardados y si hay un corte.",
+      place: "Cada lugar: el corte de ahora, los próximos y cómo reportar.",
+      map: "El mapa en vivo, también dentro de la app.",
+    },
   },
   map: {
     title: "Mapa de cortes en Quito",
