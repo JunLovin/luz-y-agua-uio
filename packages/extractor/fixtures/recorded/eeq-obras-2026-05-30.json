@@ -1,0 +1,58 @@
+{
+  "source": {
+    "description": "EEQ, obras preventivas, 30 y 31 de mayo de 2026 (PDF, 1 página)",
+    "sha256": "9a788f04573d878f29fbae4bf9d188a0d8628cea357d4e42f7421d0f5c1fffee"
+  },
+  "receivedDate": "2026-05-28",
+  "responses": {
+    "table": {
+      "transcription": "| Fecha | Zona de cortes | Sectores | Tipo de trabajo | Horario |\n|---|---|---|---|---|\n| Sábado, 30 de mayo de 2026 | ALANGASÍ | LAS RETAMAS | REMODELACIÓN DE LA RED DE MEDIO VOLTAJE TRIFÁSICA | 09:00 a 13:00 |\n| Domingo, 31 de mayo de 2026 | BARRIO NUEVO | LA VILLAFLORA | APLOME DE POSTES, CAMBIO DE SECCIONADORES OBSOLETOS EN CENTROS DE TRANSFORMACIÓN | 09:00 a 13:00 |",
+      "outages": [
+        {
+          "service": "luz",
+          "zoneNames": ["ALANGASÍ"],
+          "barrioNames": ["LAS RETAMAS"],
+          "date": "2026-05-30",
+          "start": "09:00",
+          "end": "13:00",
+          "endsNextDay": false,
+          "notes": "Remodelación de la red de medio voltaje trifásica"
+        },
+        {
+          "service": "luz",
+          "zoneNames": ["BARRIO NUEVO"],
+          "barrioNames": ["LA VILLAFLORA"],
+          "date": "2026-05-31",
+          "start": "09:00",
+          "end": "13:00",
+          "endsNextDay": false,
+          "notes": "Aplome de postes y cambio de seccionadores"
+        }
+      ]
+    },
+    "direct": {
+      "outages": [
+        {
+          "service": "luz",
+          "zoneNames": ["Alangasí"],
+          "barrioNames": ["Las Retamas"],
+          "date": "2026-05-30",
+          "start": "09:00",
+          "end": "13:00",
+          "endsNextDay": false,
+          "notes": null
+        },
+        {
+          "service": "luz",
+          "zoneNames": ["Barrio Nuevo"],
+          "barrioNames": ["La Villaflora"],
+          "date": "2026-05-31",
+          "start": "09:00",
+          "end": "13:00",
+          "endsNextDay": false,
+          "notes": null
+        }
+      ]
+    }
+  }
+}

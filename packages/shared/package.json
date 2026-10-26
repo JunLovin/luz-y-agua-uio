@@ -1,0 +1,30 @@
+{
+  "name": "@luz-y-agua/shared",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "pnpm run build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^24"
+  },
+  "dependencies": {
+    "@turf/boolean-point-in-polygon": "7.4.0",
+    "@types/geojson": "^7946.0.16"
+  }
+}

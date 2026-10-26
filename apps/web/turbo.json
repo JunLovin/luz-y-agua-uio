@@ -1,0 +1,15 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": [
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY",
+        "ADMIN_EMAIL",
+        "NEXT_PUBLIC_SITE_URL"
+      ],
+      "cache": false
+    }
+  }
+}

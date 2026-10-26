@@ -1,0 +1,9 @@
+{
+  "lock": false,
+  "imports": {
+    "@luz-y-agua/shared": "../../../packages/shared/src/index.ts",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.117.2",
+    "@turf/boolean-point-in-polygon": "npm:@turf/boolean-point-in-polygon@7.4.0",
+    "geojson": "npm:@types/geojson@7946.0.16"
+  }
+}

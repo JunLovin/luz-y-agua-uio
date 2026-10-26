@@ -1,0 +1,30 @@
+{
+  "zones": [
+    {
+      "id": "eeq_prueba_sur",
+      "utility": "eeq",
+      "name": "Zona de prueba EEQ Sur",
+      "aliases": ["Prueba Sur", "Alimentador Prueba 1"],
+      "barrios": ["solanda", "chillogallo", "quitumbe", "la_argelia"]
+    },
+    {
+      "id": "eeq_prueba_valles",
+      "utility": "eeq",
+      "name": "Zona de prueba EEQ Valles",
+      "aliases": ["Prueba Valles"],
+      "barrios": ["cumbaya", "tumbaco", "conocoto"]
+    },
+    {
+      "id": "epmaps_prueba_norte",
+      "utility": "epmaps",
+      "name": "Sector de prueba Epmaps Norte",
+      "barrios": ["cotocollao", "carcelen", "el_condado"]
+    },
+    {
+      "id": "epmaps_prueba_centro",
+      "utility": "epmaps",
+      "name": "Sector de prueba Epmaps Centro",
+      "barrios": ["centro_historico", "itchimbia", "san_juan"]
+    }
+  ]
+}
