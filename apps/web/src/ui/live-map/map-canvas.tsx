@@ -18,11 +18,17 @@ type Props = {
   selected: string | null;
   cooperative: boolean;
   onSelect: (id: string | null) => void;
+  /** Pixels hidden behind a panel on the map's left side, so the city stays in view. */
+  coveredLeft: () => number;
   onDrawn: () => void;
   onError: () => void;
 };
 
-const QUITO: [number, number] = [-78.5, -0.2];
+// The urban valley from Carcelén to Quitumbe, plus Cumbayá and Los Chillos to the east.
+const QUITO: [[number, number], [number, number]] = [
+  [-78.58, -0.33],
+  [-78.4, -0.08],
+];
 const SOURCE = "barrios";
 const GLOW = "barrios-glow";
 const BREATHS = 3;
@@ -104,6 +110,7 @@ export default function MapCanvas({
   selected,
   cooperative,
   onSelect,
+  coveredLeft,
   onDrawn,
   onError,
 }: Props) {
@@ -114,6 +121,7 @@ export default function MapCanvas({
     service,
     selected,
     onSelect,
+    coveredLeft,
     onDrawn,
     onError,
   });
@@ -123,6 +131,7 @@ export default function MapCanvas({
       service,
       selected,
       onSelect,
+      coveredLeft,
       onDrawn,
       onError,
     };
@@ -138,8 +147,7 @@ export default function MapCanvas({
     const map = new maplibregl.Map({
       container: container.current!,
       style: styleUrl,
-      center: QUITO,
-      zoom: 10.2,
+      bounds: QUITO,
       minZoom: 9,
       maxZoom: 15,
       cooperativeGestures: cooperative,
@@ -156,6 +164,16 @@ export default function MapCanvas({
       },
     });
     map.touchZoomRotate.disableRotation();
+    const fitPadding = () =>
+      map.setPadding({
+        left: latest.current.coveredLeft(),
+        top: 0,
+        right: 0,
+        bottom: 0,
+      });
+    fitPadding();
+    map.fitBounds(QUITO, { padding: 24, animate: false });
+    map.on("resize", fitPadding);
     map.addControl(
       new maplibregl.NavigationControl({ showCompass: false }),
       "top-right",

@@ -1,4 +1,4 @@
-import { Droplet, Users, Zap } from "lucide-react";
+import { Droplet, FileText, ShieldCheck, Users, Zap } from "lucide-react";
 import { cacheLife } from "next/cache";
 import Link from "next/link";
 import { outagesToday } from "@/domain/today";
@@ -10,6 +10,12 @@ import { LiveMap } from "@/ui/live-map/live-map";
 
 const capitalize = (text: string) =>
   text.charAt(0).toUpperCase() + text.slice(1);
+
+const HOW = [
+  { key: "official", icon: FileText, tone: "luz" },
+  { key: "neighbors", icon: Users, tone: "crowd" },
+  { key: "privacy", icon: ShieldCheck, tone: "agua" },
+] as const;
 
 export default async function Home() {
   "use cache";
@@ -23,41 +29,56 @@ export default async function Home() {
     { service: "agua", icon: Droplet, href: "/cortes-de-agua-quito-hoy" },
   ] as const;
 
-  return (
+  const intro = (
     <>
-      <section className="hero" aria-labelledby="titulo">
-        <div className="hero-text">
-          <p className="muted">{capitalize(formatLongDate(now))}</p>
-          <h1 id="titulo">{t.title}</h1>
-          <p className="lead">{t.lead}</p>
-        </div>
-        <LiveMap city={city} sources={sources} variant="hero" />
-      </section>
-
-      <section className="tiles" aria-label={t.title}>
+      <p className="muted">{capitalize(formatLongDate(now))}</p>
+      <h1 id="titulo">{t.title}</h1>
+      <p className="lead">{t.lead}</p>
+      <div className="counts">
         {services.map(({ service, icon: Icon, href }) => {
           const count = outagesToday(city, service, now).length;
           return (
-            <Link key={service} href={href} className={`tile tone-${service}`}>
-              <Icon size={28} aria-hidden="true" />
-              <span className="big">{count}</span>{" "}
-              <span>{t.count(count, es.services[service])}.</span>{" "}
-              <span className="muted" style={{ color: "inherit" }}>
-                {t.seeList}
-              </span>
+            <Link key={service} href={href} className={`count tone-${service}`}>
+              <span className="big">
+                <Icon size={24} aria-hidden="true" />
+                {count}
+              </span>{" "}
+              <span>{t.count(count, es.services[service])}</span>
             </Link>
           );
         })}
-      </section>
-
+      </div>
       {crowdBarrios > 0 && (
         <p className="pill tone-crowd">
           <Users size={18} aria-hidden="true" />
           {t.crowd(crowdBarrios)}
         </p>
       )}
+    </>
+  );
 
-      <section className="card app-section" aria-labelledby="app">
+  return (
+    <>
+      <section aria-labelledby="titulo">
+        <LiveMap city={city} sources={sources} variant="hero" intro={intro} />
+      </section>
+
+      <section className="section" aria-labelledby="como">
+        <h2 id="como">{t.howTitle}</h2>
+        <ul className="how-list">
+          {HOW.map(({ key, icon: Icon, tone }) => (
+            <li key={key} className={`tone-${tone}`}>
+              <span className="badge badge-lg">
+                <Icon size={26} aria-hidden="true" />
+              </span>
+              <h3>{t.how[key].title}</h3>
+              <p>{t.how[key].body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="section card app-section" aria-labelledby="app">
         <div className="app-text">
           <h2 id="app">{t.appTitle}</h2>
           <p>{t.appBody}</p>

@@ -15,11 +15,16 @@ export default async function MapPage() {
   cacheLife("city");
   const [city, sources] = await Promise.all([getCity(), getMapSources()]);
   return (
-    <>
-      <div className="page-head">
-        <h1>{es.map.title}</h1>
-      </div>
-      <LiveMap city={city} sources={sources} variant="page" />
-    </>
+    <LiveMap
+      city={city}
+      sources={sources}
+      variant="page"
+      intro={
+        <>
+          <h1>{es.map.title}</h1>
+          <p className="lead">{es.home.lead}</p>
+        </>
+      }
+    />
   );
 }

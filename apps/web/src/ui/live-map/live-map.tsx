@@ -11,7 +11,7 @@ import {
 import { Droplet, X, Zap } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { exampleCity } from "@/domain/example";
 import { es } from "@/i18n/es";
 import type { MapSources } from "@/server/city";
@@ -24,16 +24,26 @@ type Props = {
   city: CitySnapshot;
   sources: MapSources;
   variant: "hero" | "page";
+  /** Title and summary: above the map on phones, in the floating panel on desktop. */
+  intro: ReactNode;
 };
 
 const ICONS = { luz: Zap, agua: Droplet } as const;
 const capitalize = (text: string) =>
   text.charAt(0).toUpperCase() + text.slice(1);
 
-export function LiveMap({ city, sources, variant }: Props) {
+export function LiveMap({ city, sources, variant, intro }: Props) {
   const t = es.map;
   const scheme = useScheme();
   const frame = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  // On desktop the panel floats over the map's left side: the map centers on what is left.
+  const coveredLeft = () => {
+    const p = panel.current;
+    const f = frame.current;
+    if (!p || !f || getComputedStyle(p).position !== "absolute") return 0;
+    return p.getBoundingClientRect().right - f.getBoundingClientRect().left;
+  };
   const [visible, setVisible] = useState(false);
   // "now" is taken when the barrios arrive, in the browser, never during the prerender.
   const [loaded, setLoaded] = useState<{
@@ -103,26 +113,9 @@ export function LiveMap({ city, sources, variant }: Props) {
 
   return (
     <div className={`live-map live-map-${variant}`}>
-      <div className="map-frame" ref={frame}>
-        {(failed || !drawn) && (
-          <p className="map-status muted" role="status">
-            {failed ? t.unavailable : t.loading}
-          </p>
-        )}
-        {visible && barrios && !failed && (
-          <MapCanvas
-            styleUrl={sources.styles[scheme]}
-            barrios={barrios}
-            service={service}
-            selected={selected}
-            cooperative={variant === "hero"}
-            onSelect={setSelected}
-            onDrawn={() => setDrawn(true)}
-            onError={() => setFailed(true)}
-          />
-        )}
-
-        <div className="map-top">
+      <div className="map-panel" ref={panel}>
+        <div className="map-intro">{intro}</div>
+        <div className="map-controls">
           <div className="segmented" role="group" aria-label={t.service}>
             {(["luz", "agua"] as const).map((option) => {
               const Icon = ICONS[option];
@@ -140,12 +133,82 @@ export function LiveMap({ city, sources, variant }: Props) {
               );
             })}
           </div>
-          {example && (
-            <p className="pill tone-crowd example-badge" role="status">
-              {t.example}
+        </div>
+        <div className="map-foot">
+          <ul className="legend" aria-label={t.legendLabel}>
+            {(["high", "medium", "crowd"] as const).map((status) => (
+              <li key={status}>
+                <span
+                  className={`swatch swatch-${status} tone-${status === "crowd" ? "crowd" : service}`}
+                  aria-hidden="true"
+                />
+                {t.legend[status]}
+              </li>
+            ))}
+          </ul>
+          {barrios && (
+            <p className="muted" aria-live="polite">
+              {t.summary(affected.length, es.services[service])}{" "}
+              {example ? (
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => switchExample(false)}
+                >
+                  {t.backToToday}
+                </button>
+              ) : (
+                <Link href={`/cortes-de-${service}-quito-hoy`}>
+                  {es.home.seeList}
+                </Link>
+              )}
             </p>
           )}
+          {affected.length > 0 && (
+            <ul className="affected" aria-label={t.affected}>
+              {affected.map((barrio) => (
+                <li key={barrio.id}>
+                  <button
+                    type="button"
+                    className={`chip tone-${barrio.status === "crowd" ? "crowd" : service}`}
+                    data-status={barrio.status}
+                    data-barrio={barrio.id}
+                    aria-pressed={selected === barrio.id}
+                    onClick={() => setSelected(barrio.id)}
+                  >
+                    {barrio.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
+      </div>
+      <div className="map-frame" ref={frame}>
+        {(failed || !drawn) && (
+          <p className="map-status muted" role="status">
+            {failed ? t.unavailable : t.loading}
+          </p>
+        )}
+        {visible && barrios && !failed && (
+          <MapCanvas
+            styleUrl={sources.styles[scheme]}
+            barrios={barrios}
+            service={service}
+            selected={selected}
+            cooperative={variant === "hero"}
+            onSelect={setSelected}
+            coveredLeft={coveredLeft}
+            onDrawn={() => setDrawn(true)}
+            onError={() => setFailed(true)}
+          />
+        )}
+
+        {example && (
+          <p className="pill tone-crowd example-badge" role="status">
+            {t.example}
+          </p>
+        )}
 
         {barrios && quiet && !example && (
           <div className="map-empty">
@@ -177,56 +240,6 @@ export function LiveMap({ city, sources, variant }: Props) {
                 ?.focus();
             }}
           />
-        )}
-      </div>
-
-      <div className="map-foot">
-        <ul className="legend" aria-label={t.legendLabel}>
-          {(["high", "medium", "crowd"] as const).map((status) => (
-            <li key={status}>
-              <span
-                className={`swatch swatch-${status} tone-${status === "crowd" ? "crowd" : service}`}
-                aria-hidden="true"
-              />
-              {t.legend[status]}
-            </li>
-          ))}
-        </ul>
-        {barrios && (
-          <p className="muted" aria-live="polite">
-            {t.summary(affected.length, es.services[service])}{" "}
-            {example ? (
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => switchExample(false)}
-              >
-                {t.backToToday}
-              </button>
-            ) : (
-              <Link href={`/cortes-de-${service}-quito-hoy`}>
-                {es.home.seeList}
-              </Link>
-            )}
-          </p>
-        )}
-        {affected.length > 0 && (
-          <ul className="affected" aria-label={t.affected}>
-            {affected.map((barrio) => (
-              <li key={barrio.id}>
-                <button
-                  type="button"
-                  className={`chip tone-${barrio.status === "crowd" ? "crowd" : service}`}
-                  data-status={barrio.status}
-                  data-barrio={barrio.id}
-                  aria-pressed={selected === barrio.id}
-                  onClick={() => setSelected(barrio.id)}
-                >
-                  {barrio.name}
-                </button>
-              </li>
-            ))}
-          </ul>
         )}
       </div>
     </div>

@@ -32,6 +32,21 @@ export const es = {
     seeList: "Ver la lista por barrio",
     crowd: (barrios: number) =>
       `Vecinos reportan cortes en ${plural(barrios, "barrio", "barrios")} en este momento.`,
+    howTitle: "Cómo funciona",
+    how: {
+      official: {
+        title: "Cortes anunciados",
+        body: "Leemos los cronogramas públicos de la EEQ y de Epmaps y marcamos cada barrio afectado, con su horario y de dónde sale el aviso.",
+      },
+      neighbors: {
+        title: "Lo que viven tus vecinos",
+        body: "Si varios vecinos reportan que se fue la luz o el agua, su barrio se pinta de morado aunque nadie lo haya anunciado.",
+      },
+      privacy: {
+        title: "Privado de verdad",
+        body: "Sin cuentas ni rastreadores. La app calcula tu barrio en el teléfono y tu ubicación nunca sale de ahí.",
+      },
+    },
     appTitle: "La app",
     appBody:
       "Guarda tu casa o tu trabajo y recibe un aviso cuando se anuncie un corte en tu barrio. Sin cuentas: tu ubicación nunca sale del teléfono.",

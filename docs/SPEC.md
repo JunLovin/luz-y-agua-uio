@@ -448,6 +448,9 @@ Para quien tiene su planilla: un botón abre el buscador oficial de la EEQ en el
 
 - `/` — Landing con el mapa en vivo en la cabecera, el número de cortes de hoy por servicio y una vista previa de la app (capturas en un teléfono dibujado, que se puede pausar).
 - `/mapa` — El mapa en vivo a pantalla completa.
+
+En escritorio (desde 64rem) el mapa ocupa todo el ancho de la ventana y el título, el selector Luz/Agua, la leyenda y los barrios afectados flotan en un panel a la izquierda; el mapa centra la ciudad en el espacio que queda libre. En el teléfono el mismo contenido va en orden: título, selector, mapa y lista. El resto de páginas usa un contenedor de 76rem.
+
 - `/cortes-de-luz-quito-hoy` y `/cortes-de-agua-quito-hoy` — Páginas para Google con la lista del día por barrio, ISR cada 5 minutos, datos estructurados y fecha visible. Son las que atraen tráfico.
 - `/barrio/[id]` — Estado de un barrio. Se prerenderizan todos los barrios de `public_barrios`; uno inexistente responde 404.
 - `/privacidad`, `/terminos`, `/acerca` — Textos legales y aviso de independencia.
