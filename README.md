@@ -4,6 +4,16 @@ App gratuita y de código abierto que avisa a los quiteños de cortes de luz y a
 
 > App independiente, no afiliada a la EEQ, a Epmaps ni al Municipio de Quito.
 
+<p align="center">
+  <img src="apps/web/public/app/inicio.png" alt="Mis lugares: los barrios guardados y si hay un corte" width="220">
+  <img src="apps/web/public/app/lugar.png" alt="Detalle de un lugar: el corte de ahora, los próximos y cómo reportar" width="220">
+  <img src="apps/web/public/app/mapa.png" alt="Mapa en vivo de Quito con los barrios afectados" width="220">
+</p>
+
+## Estado
+
+En desarrollo. La app todavía no está en Google Play ni en la App Store; la web y la app se pueden correr en local siguiendo [`CONTRIBUTING.md`](CONTRIBUTING.md). Los datos de las capturas son de ejemplo.
+
 ## Privacidad por diseño
 
 - Sin cuentas: no pedimos nombre, cédula, teléfono, correo ni número de suministro.
@@ -24,6 +34,12 @@ El diseño técnico completo está en [`docs/SPEC.md`](docs/SPEC.md).
 | `supabase`           | Base de datos, migraciones y funciones              | AGPL-3.0 |
 
 El resto del repositorio está bajo AGPL-3.0. El nombre y el logo "Luz y Agua UIO" no están cubiertos por ninguna licencia de código.
+
+## Datos
+
+- Calles, mapa base y límites de las parroquias: © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright), bajo la licencia ODbL. Las teselas se sirven desde nuestro propio almacenamiento.
+- Cortes programados: documentos públicos de la EEQ y de Epmaps. Nunca se extraen datos de sitios que lo prohíban (ver [`docs/SPEC.md`](docs/SPEC.md)).
+- Cortes no programados: reportes anónimos de vecinos.
 
 ## Desarrollo
 
