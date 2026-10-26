@@ -1,5 +1,5 @@
 import { config } from "@luz-y-agua/shared";
-import { Droplet, Zap } from "lucide-react";
+import { Droplet, Map as MapIcon, Zap } from "lucide-react";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Link from "next/link";
@@ -69,6 +69,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   style={{ color: "var(--tone)" }}
                 />
                 {t.nav.agua}
+              </Link>
+              <Link href="/mapa" className="nav-link tone-crowd">
+                <MapIcon
+                  size={18}
+                  aria-hidden="true"
+                  style={{ color: "var(--tone)" }}
+                />
+                {t.nav.map}
               </Link>
             </nav>
           </div>
