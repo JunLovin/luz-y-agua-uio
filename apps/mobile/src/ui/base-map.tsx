@@ -14,7 +14,7 @@ import type { Service } from "@luz-y-agua/shared";
 import { useTheme } from "./theme";
 import type { Palette } from "./tokens";
 
-/** Our own style in our own storage: no third-party tile, font or geocoding server (CLAUDE.md rule 11). */
+/** Our own style in our own storage: no third-party tile, font or geocoding server (PRINCIPIOS.md rule 11). */
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const styleUrl = (scheme: "dark" | "light") =>
   supabaseUrl &&

@@ -4,7 +4,7 @@ import type { ReportSender, SendResult } from "../application/submit-report";
 const TIMEOUT_MS = 15_000;
 const RESULTS: SendResult[] = ["ok", "rate_limited", "unknown_barrio"];
 
-/** The only request with a barrioId (CLAUDE.md rule 12): exactly the four report fields. */
+/** The only request with a barrioId (PRINCIPIOS.md rule 12): exactly the four report fields. */
 export function reportApi(
   baseUrl: string,
   anonKey: string,

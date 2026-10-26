@@ -49,7 +49,7 @@ async function accessToken(account: ServiceAccount): Promise<string> {
   return ((await response.json()) as { access_token: string }).access_token;
 }
 
-/** FCM HTTP v1, addressed by topic condition only: we never hold device tokens (CLAUDE.md rule 3). */
+/** FCM HTTP v1, addressed by topic condition only: we never hold device tokens (PRINCIPIOS.md rule 3). */
 export function fcmSender(projectId: string, account: ServiceAccount) {
   let token: Promise<string> | null = null;
   return async (notification: Notification) => {

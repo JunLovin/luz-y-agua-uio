@@ -1,7 +1,7 @@
 import type { BarriosGeoJson } from "@luz-y-agua/shared";
 import type { CitySnapshot, CrowdLive, PublicOutage } from "../domain/city";
 
-/** Read-only public endpoints. None of them is ever filtered by barrio (CLAUDE.md rule 12). */
+/** Read-only public endpoints. None of them is ever filtered by barrio (PRINCIPIOS.md rule 12). */
 export interface PublicApi {
   outages(): Promise<PublicOutage[]>;
   crowd(): Promise<CrowdLive[]>;

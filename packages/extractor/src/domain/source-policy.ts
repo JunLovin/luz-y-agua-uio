@@ -2,7 +2,7 @@ const AGENT_TOKEN = "luzyaguauio";
 export const USER_AGENT =
   "LuzYAguaUIO/1.0 (+https://github.com/JunLovin/luz-y-agua-uio)";
 
-// CLAUDE.md rule 6: never fetched automatically, whatever the database says.
+// PRINCIPIOS.md rule 6: never fetched automatically, whatever the database says.
 const BLOCKED_HOSTS = ["eeq.com.ec"];
 
 export type UrlSource = { automatedAllowed: boolean; baseUrl: string | null };

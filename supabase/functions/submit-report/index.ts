@@ -25,7 +25,7 @@ const json = (body: unknown, status: number) =>
 
 /**
  * §7: the only request that carries a barrioId. The IP is passed to Postgres to be HMAC'd with
- * the salt of the day and is never logged or stored in clear (CLAUDE.md rule 10).
+ * the salt of the day and is never logged or stored in clear (PRINCIPIOS.md rule 10).
  */
 Deno.serve(async (request) => {
   if (request.method !== "POST")
