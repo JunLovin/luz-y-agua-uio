@@ -2,10 +2,7 @@
 
 ## Reportar una vulnerabilidad
 
-No abras un issue público. Repórtala en privado por cualquiera de estas vías:
-
-- Correo: CORREO_DEL_PROYECTO
-- GitHub: pestaña **Security** del repositorio → **Report a vulnerability** (reporte privado de vulnerabilidades, disponible desde que el repositorio sea público).
+No abras un issue público. Repórtala en privado desde la pestaña **Security** del repositorio → **Report a vulnerability** (reporte privado de vulnerabilidades de GitHub).
 
 Incluye una descripción, los pasos para reproducirla y el impacto que esperas. Respondemos lo antes posible y te avisamos cuando esté corregida.
 
