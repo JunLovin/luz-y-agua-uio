@@ -28,3 +28,4 @@ export {
   type CrowdLive,
   type PublicOutage,
 } from "./city.ts";
+export { mapBarrios, type MapBarrio, type MapStatus } from "./map.ts";

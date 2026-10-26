@@ -3,7 +3,11 @@ import { getBarrioNames } from "@/server/city";
 import { siteUrl } from "@/server/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const today = ["/cortes-de-luz-quito-hoy", "/cortes-de-agua-quito-hoy"];
+  const today = [
+    "/cortes-de-luz-quito-hoy",
+    "/cortes-de-agua-quito-hoy",
+    "/mapa",
+  ];
   const barrios = Object.keys(await getBarrioNames()).map(
     (id) => `/barrio/${id}`,
   );

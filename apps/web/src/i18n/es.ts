@@ -10,7 +10,7 @@ export const es = {
   independence: "App independiente, no afiliada a la EEQ ni a Epmaps.",
   layout: {
     skip: "Saltar al contenido",
-    nav: { luz: "Luz hoy", agua: "Agua hoy" },
+    nav: { luz: "Luz hoy", agua: "Agua hoy", map: "Mapa" },
     legal: { privacy: "Privacidad", terms: "Términos", about: "Acerca" },
     sourceCode: "Código en GitHub",
     theme: "Apariencia",
@@ -23,18 +23,94 @@ export const es = {
   services: { luz: "luz", agua: "agua" },
   serviceTitles: { luz: "Luz", agua: "Agua" },
   home: {
-    title: "Cortes de luz y agua en Quito, hoy",
+    // The headline reads as one sentence; each part is its own line on screen.
+    headline: {
+      luzBefore: "¿Se va ",
+      luz: "la luz",
+      aguaBefore: "¿Se va ",
+      agua: "el agua",
+      after: "Entérate antes.",
+    },
+    live: (time: string) => `En vivo · actualizado a las ${time}`,
+    lead: "Los cortes anunciados en Quito y lo que reportan tus vecinos, barrio por barrio, en un solo mapa.",
+    tapHint:
+      "Toca un barrio en el mapa para ver su horario y de dónde viene el aviso.",
     count: (n: number, service: string) =>
-      n === 1
-        ? `corte de ${service} anunciado hoy`
-        : `cortes de ${service} anunciados hoy`,
+      n === 1 ? `corte de ${service} hoy` : `cortes de ${service} hoy`,
+    countNone: (service: string) => `Sin cortes de ${service} hoy`,
+    trust: ["Gratis", "Sin cuentas", "Tu ubicación no sale del teléfono"],
+    statement: "barrios en el mapa.",
+    statementAfter: "Tú solo necesitas saber del tuyo.",
+    seeMap: "Abrir el mapa completo",
     seeList: "Ver la lista por barrio",
     crowd: (barrios: number) =>
       `Vecinos reportan cortes en ${plural(barrios, "barrio", "barrios")} en este momento.`,
-    appTitle: "La app",
+    howTitle: "Así sabemos lo que pasa en tu barrio",
+    how: {
+      official: {
+        title: "Lo que anuncian la EEQ y Epmaps",
+        body: "Leemos sus cronogramas públicos y ubicamos cada corte en su barrio, con el horario y la fuente.",
+      },
+      neighbors: {
+        title: "Lo que viven tus vecinos",
+        body: "Cuando varios vecinos reportan que se fue la luz o el agua, su barrio se pinta de morado, aunque nadie lo haya anunciado.",
+      },
+      privacy: {
+        title: "Lo que no sabemos de ti",
+        body: "Ni tu nombre, ni tu número, ni dónde estás. La app calcula tu barrio en el teléfono y ahí se queda.",
+      },
+    },
+    appTitle: "Guarda tu casa. Te avisamos antes del corte.",
     appBody:
-      "Guarda tu casa o tu trabajo y recibe un aviso cuando se anuncie un corte en tu barrio. Sin cuentas: tu ubicación nunca sale del teléfono.",
+      "Agrega tu casa, tu trabajo o la casa de tus papás. Recibe un aviso cuando anuncien un corte en ese barrio, y otro un rato antes de que empiece.",
     soon: "Próximamente en Android y iPhone",
+  },
+  preview: {
+    label: "Pantallas de la app",
+    pause: "Pausar las pantallas",
+    play: "Reanudar las pantallas",
+    shots: {
+      home: "Mis lugares: tus barrios guardados y si hay un corte.",
+      place: "Cada lugar: el corte de ahora, los próximos y cómo reportar.",
+      map: "El mapa en vivo, también dentro de la app.",
+    },
+  },
+  map: {
+    title: "Mapa de cortes en Quito",
+    description:
+      "Mapa en vivo de los barrios de Quito con cortes de luz y agua anunciados y los que reportan los vecinos.",
+    label: "Mapa de Quito con los barrios afectados",
+    service: "Servicio",
+    legendLabel: "Leyenda",
+    affected: "Barrios afectados",
+    legend: {
+      high: "Corte anunciado",
+      medium: "Sin confirmar",
+      crowd: "Vecinos reportan",
+    },
+    summary: (n: number, service: string) =>
+      n === 0
+        ? `Ningún barrio con corte de ${service} ahora ni más tarde hoy.`
+        : `${plural(n, "barrio", "barrios")} con corte de ${service} hoy.`,
+    empty: "Hoy no hay cortes anunciados ni reportes de vecinos en Quito.",
+    showExample: "Ver un ejemplo",
+    example: "Ejemplo: estos no son cortes reales.",
+    backToToday: "Volver a los cortes de hoy",
+    exampleSource: "Ejemplo",
+    loading: "Cargando el mapa…",
+    unavailable:
+      "No se pudo cargar el mapa. Revisa tu conexión y recarga la página.",
+    openBarrio: "Ver el barrio",
+    close: "Cerrar",
+    clear: (service: string) => `Sin cortes de ${service} hoy.`,
+    crowd: (reports: number) =>
+      `${plural(reports, "vecino reporta", "vecinos reportan")} corte ahora.`,
+    attribution: "© colaboradores de OpenStreetMap",
+    gestures: {
+      windows: "Usa Ctrl + rueda del mouse para acercar el mapa",
+      mac: "Usa ⌘ + rueda del mouse para acercar el mapa",
+      mobile: "Usa dos dedos para mover el mapa",
+    },
   },
   today: {
     title: (service: string) => `Cortes de ${service} en Quito hoy`,

@@ -446,7 +446,11 @@ Para quien tiene su planilla: un botón abre el buscador oficial de la EEQ en el
 
 ## 9. Web pública (`apps/web`)
 
-- `/` — Landing con descarga de la app y estado general ("Hoy hay N cortes programados en Quito").
+- `/` — Landing con el mapa en vivo en la cabecera, el número de cortes de hoy por servicio y una vista previa de la app (capturas en un teléfono dibujado, que se puede pausar).
+- `/mapa` — El mapa en vivo a pantalla completa.
+
+En escritorio (desde 64rem) el mapa ocupa todo el ancho de la ventana y el título, el selector Luz/Agua, la leyenda y los barrios afectados flotan en un panel a la izquierda; el mapa centra la ciudad en el espacio que queda libre. En el teléfono el mismo contenido va en orden: título, selector, mapa y lista. El resto de páginas usa un contenedor de 76rem.
+
 - `/cortes-de-luz-quito-hoy` y `/cortes-de-agua-quito-hoy` — Páginas para Google con la lista del día por barrio, ISR cada 5 minutos, datos estructurados y fecha visible. Son las que atraen tráfico.
 - `/barrio/[id]` — Estado de un barrio. Se prerenderizan todos los barrios de `public_barrios`; uno inexistente responde 404.
 - `/privacidad`, `/terminos`, `/acerca` — Textos legales y aviso de independencia.
@@ -460,6 +464,8 @@ Rendimiento en picos: las páginas públicas se sirven desde caché de Vercel; l
 - `sitemap.xml` y `robots.txt` usan `NEXT_PUBLIC_SITE_URL`; `/admin` no se indexa. Las páginas de hoy llevan datos estructurados (`ItemList` de `Event`).
 
 Privacidad en la web: sin cookies salvo la sesión del panel de administración, sin Vercel Analytics ni Speed Insights, sin Google Analytics, sin píxeles ni fuentes cargadas desde terceros (las fuentes se sirven desde el propio dominio). Así no hace falta banner de cookies.
+
+Mapa en vivo: MapLibre GL JS con el mismo estilo y las mismas teselas PMTiles de la app, todo desde nuestro almacenamiento (regla 11); el navegador descarga el GeoJSON de barrios publicado en `public_barrios_meta`. MapLibre (unos 250 KB) se carga solo en el navegador y cuando el mapa está por entrar en pantalla, y su _worker_ se sirve desde el propio dominio (`apps/web/public/maplibre-gl-worker.mjs`, copiado de `node_modules` al compilar). Los barrios se colorean con `mapBarrios` de `packages/shared`, igual que en la app: corte anunciado, sin confirmar o vecinos reportan. Debajo del mapa, la lista de barrios afectados son botones que abren la ficha del barrio, así el mapa se usa también con teclado y lector de pantalla. Si hoy no hay cortes ni reportes, el mapa ofrece "Ver un ejemplo": cortes inventados con la fuente "Ejemplo" y un aviso fijo "estos no son cortes reales", sin enlaces a páginas de barrio. Las zonas afectadas "respiran" tres veces al cargar y luego quedan quietas (nada si el visitante pidió menos movimiento).
 
 Diseño: la misma identidad "Volcán" de la app, oscura por defecto. El selector Oscuro / Claro / Automático del pie guarda la elección solo en ese navegador, en `localStorage` (no es una cookie ni sale del navegador), y un script mínimo la aplica antes de pintar. La fuente Atkinson Hyperlegible Next se sirve desde el propio dominio (`next/font/local`, con licencia OFL en `apps/web/src/fonts`).
 
