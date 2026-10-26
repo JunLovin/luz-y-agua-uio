@@ -1,7 +1,7 @@
-import type { BarriosGeoJson } from "@luz-y-agua/shared";
+import type { BarriosGeoJson } from "./geo.ts";
 import { describe, expect, it } from "vitest";
-import type { CitySnapshot, PublicOutage } from "./city";
-import { mapBarrios } from "./map";
+import type { CitySnapshot, PublicOutage } from "./city.ts";
+import { mapBarrios } from "./map.ts";
 
 const polygon = { type: "Polygon" as const, coordinates: [] };
 const barrios: BarriosGeoJson = {
