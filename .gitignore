@@ -32,3 +32,6 @@ GoogleService-Info.plist
 
 # Copied from maplibre-gl at build time (pnpm --filter web map-worker)
 apps/web/public/maplibre-gl-worker.mjs
+
+# Written by `next dev` for coding agents
+apps/web/AGENTS.md

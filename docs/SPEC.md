@@ -179,7 +179,7 @@ create table reports (
   status text not null check (status in ('out','restored')),
   dedup_hash text not null,         -- HMAC diario, ver §7
   salt_day date not null,           -- día (hora de Ecuador) de la sal usada en dedup_hash
-  weight real not null default 1,   -- 0.5 si la atestación falla (§7, desde H7)
+  weight real not null default 1,   -- 0.5 si la atestación falla (§7)
   received_at timestamptz not null default now()
 );
 

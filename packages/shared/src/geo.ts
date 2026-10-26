@@ -17,7 +17,7 @@ export function findBarrio(
   ) {
     throw new RangeError(`Invalid coordinates: ${lat}, ${lng}`);
   }
-  // ponytail: linear scan is fine for 65 parroquias; add a bbox prefilter for the ~1,300 Geoportal barrios.
+  // A linear scan is fine for 65 parroquias; the ~1,300 Geoportal barrios will need a bbox prefilter.
   const match = barrios.features.find((feature) =>
     booleanPointInPolygon([lng, lat], feature),
   );
