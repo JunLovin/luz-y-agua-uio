@@ -1,5 +1,5 @@
 /** Where people write about privacy, their data or security. */
-const contact = "CORREO_DEL_PROYECTO";
+const contact = "legal@luzyaguauio.com";
 
 const plural = (n: number, one: string, many: string) =>
   `${n} ${n === 1 ? one : many}`;
